@@ -3,7 +3,8 @@
     |sai| |itmo|
 
 
-# ProtoLLM
+Intro
+#####
 
 **Proto-LLM** is an open-source framework for fast protyping of LLM-based applications
 
@@ -13,14 +14,18 @@ Proto LLM features
 - Rapid prototyping of information retrieval systems based on BNM using RAG:
 Implementations of architectural patterns for interacting with different databases and web service interfaces;
 Methods for optimising RAG pipelines to eliminate redundancy.
+
 - Development and integration of applications with BNM with connection of external services and models through plugin system:
 Integration with AutoML solutions for predictive tasks;
 Providing structured output generation and validation;
+
 - Implementation of ensemble methods and multi-agent approaches to improve the efficiency of BNMs:
 Possibility of combining arbitrary BNMs into ensembles to improve generation quality, automatic selection of ensemble composition;
 Work with model-agents and ensemble pipelines;
+
 - Generation of complex synthetic data for further training and improvement of BNM: Generating examples from existing models and data sets;
-Evolutionary optimisation to increase the diversity of examples; Integration with Label Studio; 
+Evolutionary optimisation to increase the diversity of examples; Integration with Label Studio;
+
 - Providing interoperability with various LLM providers:
 Support for native models (GigaChat, YandexGPT, vsegpt, etc.). 
 Interaction with open-source models deployed locally.
