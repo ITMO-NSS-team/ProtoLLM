@@ -9,8 +9,8 @@ Intro
 **Proto-LLM** is an open-source framework for fast protyping of LLM-based applications.
 
 
-Proto LLM features
-==================
+Proto LLM features (WIP)
+=======================
 - Rapid prototyping of information retrieval systems based on BNM using RAG:
 Implementations of architectural patterns for interacting with different databases and web service interfaces;
 Methods for optimising RAG pipelines to eliminate redundancy.
@@ -23,7 +23,8 @@ Providing structured output generation and validation;
 Possibility of combining arbitrary BNMs into ensembles to improve generation quality, automatic selection of ensemble composition;
 Work with model-agents and ensemble pipelines;
 
-- Generation of complex synthetic data for further training and improvement of BNM: Generating examples from existing models and data sets;
+- Generation of complex synthetic data for further training and improvement of BNM:
+Generating examples from existing models and data sets;
 Evolutionary optimisation to increase the diversity of examples; Integration with Label Studio;
 
 - Providing interoperability with various LLM providers:
