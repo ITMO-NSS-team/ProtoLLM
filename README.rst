@@ -6,7 +6,7 @@
 Intro
 #####
 
-**Proto-LLM** is an open-source framework for fast protyping of LLM-based applications
+**Proto-LLM** is an open-source framework for fast protyping of LLM-based applications.
 
 
 Proto LLM features
