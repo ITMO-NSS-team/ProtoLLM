@@ -1,0 +1,5 @@
+# LangChain
+langchain>=0.2.12
+
+# Network
+requests~=2.32.3
