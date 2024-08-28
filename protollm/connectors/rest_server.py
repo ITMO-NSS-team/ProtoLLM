@@ -26,15 +26,16 @@ class ChatRESTServer(BaseChatModel):
         chat_messages: List = []
         for message in messages:
             role = ""
-            if isinstance(message, HumanMessage):
+        match message:
+            case HumanMessage():
                 role = "user"
-            elif isinstance(message, AIMessage):
+            case AIMessage():
                 role = "assistant"
-            elif isinstance(message, SystemMessage):
+            case SystemMessage():
                 role = "system"
-            else:
-                raise ValueError(
-                    "Received unsupported message type.")
+            case _:
+                raise ValueError("Received unsupported message type.")
+
 
             content = ""
             if isinstance(message.content, str):
@@ -57,7 +58,7 @@ class ChatRESTServer(BaseChatModel):
             messages: List[BaseMessage],
             stop: Optional[List[str]] = None,
             **kwargs: Any,
-    ) -> Dict:
+    ) -> Dict[str, Any]:
         payload = {
             "model": self.model,
             "messages": self._convert_messages_to_rest_server_messages(
@@ -70,13 +71,15 @@ class ChatRESTServer(BaseChatModel):
             timeout=self.timeout
         )
         response.encoding = "utf-8"
-        if response.status_code != 200:
-            if response.status_code == 404:
+        match response.status_code:
+            case 200:
+                continue  # Status code is 200, no action needed
+            case 404:
                 raise ValueError(
                     "CustomWeb call failed with status code 404. "
                     "Maybe you need to connect to the corporate network."
                 )
-            else:
+            case _:
                 optional_detail = response.text
                 raise ValueError(
                     f"CustomWeb call failed with status code "
