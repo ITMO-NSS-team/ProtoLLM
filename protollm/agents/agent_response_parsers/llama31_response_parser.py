@@ -1,13 +1,16 @@
 import ast
 import json
 
-from protollm.agents.agent_response_parsers.agent_response_parser import AgentResponseParser
+from protollm.agents.agent_response_parsers.agent_response_parser import (
+    AgentResponseParser,
+)
 
 
 class Llama31ResponseParser(AgentResponseParser):
     """
     Parses a response from the assistant to extract function calls and their parameters.
     """
+
     def __init__(
         self, function_name_field: str = "name", parameters_field: str = "parameters"
     ):
