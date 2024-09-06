@@ -44,6 +44,7 @@ class Llama31Agent(LargeLanguageModelAgent):
         functions_metadata: list,  # TODO: Make decorator to parse functions metadata
         temperature: float,
         max_tokens: int,
+        logging_level: int = logging.INFO,
     ):
         """
         Creates an instance of the Llama31Agent class.
@@ -71,7 +72,7 @@ class Llama31Agent(LargeLanguageModelAgent):
         self.context = []
 
         self.logger = logging.getLogger(__name__)
-        logging.basicConfig(level=logging.INFO)
+        logging.basicConfig(level=logging_level)
 
         self._add_to_context(
             self.custom_system_message + "\n" + str(self.functions_metadata),
