@@ -41,7 +41,7 @@ class Llama31Agent(LargeLanguageModelAgent):
         response_parser: AgentResponseParser,
         custom_system_message: str,
         custom_user_message: str,
-        functions_metadata: list,  # TODO: Make decorator to parce functions metadata
+        functions_metadata: list,  # TODO: Make decorator to parse functions metadata
         temperature: float,
         max_tokens: int,
     ):
