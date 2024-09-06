@@ -42,8 +42,8 @@ class Llama31Agent(LargeLanguageModelAgent):
         custom_system_message: str,
         custom_user_message: str,
         functions_metadata: list,  # TODO: Make decorator to parse functions metadata
-        temperature: float,
-        max_tokens: int,
+        temperature: float = 0.5,
+        max_tokens: int = 3000,
         logging_level: int = logging.INFO,
     ):
         """
