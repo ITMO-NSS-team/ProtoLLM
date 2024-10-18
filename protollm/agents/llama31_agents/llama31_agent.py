@@ -52,14 +52,15 @@ class Llama31ChatModel(BaseChatModel):
         # Convert messages to format expected by the API
         context = []
         for message in messages:
-            if isinstance(message, HumanMessage):
-                role = "user"
-            elif isinstance(message, AIMessage):
-                role = "assistant"
-            elif isinstance(message, SystemMessage):
-                role = "system"
-            else:
-                role = "user"  # default
+            match message:
+                case HumanMessage():
+                    role = "user"
+                case AIMessage():
+                    role = "assistant"
+                case SystemMessage():
+                    role = "system"
+                case _:
+                    role = "user"
             context.append({"role": role, "content": message.content})
 
         payload = {
