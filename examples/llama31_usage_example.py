@@ -73,18 +73,6 @@ prompt = ChatPromptTemplate.from_messages(
     ]
 )
 
-print("Prompt Input Variables:", prompt.input_variables)
-
-# Render tools into text
-tools_renderer = render_text_description_and_args
-rendered_tools = tools_renderer(tools)
-
-# Partial the prompt with the rendered tools and tool names
-prompt = prompt.partial(
-    tools=rendered_tools,
-    tool_names=", ".join([tool.name for tool in tools]),
-)
-
 # Initialize the custom LLM
 llm = Llama31ChatModel(
     api_key="API_KEY",
@@ -122,5 +110,4 @@ if __name__ == "__main__":
     final_answer = response["output"]
 
     # Print the final answer
-    print("Agent's Response:")
-    print(final_answer)
+    print(f"Agent's Response: \n {final_answer}")
