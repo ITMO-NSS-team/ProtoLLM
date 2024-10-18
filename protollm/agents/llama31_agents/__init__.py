@@ -1,1 +1,1 @@
-from protollm.agents.llama31_agents.llama31_agent import Llama31Agent
+from protollm.agents.llama31_agents.llama31_agent import Llama31ChatModel
