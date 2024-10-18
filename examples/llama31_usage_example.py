@@ -87,9 +87,9 @@ prompt = prompt.partial(
 
 # Initialize the custom LLM
 llm = Llama31ChatModel(
-    api_key="sk-or-vv-e4416267c3d3799449797889efbbbe4a1c80c758f3b4e6de1d969e69cb1516e7",
-    base_url="https://api.vsegpt.ru/v1",
-    model="meta-llama/llama-3.1-70b-instruct",
+    api_key="API_KEY",
+    base_url="BASE_URL",
+    model="MODEL",
     temperature=0.5,
     max_tokens=3000,
 )
