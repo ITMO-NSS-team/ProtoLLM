@@ -1,5 +1,5 @@
 import logging
-from typing import List, Optional, Any
+from typing import List, Optional, Any, Dict
 
 import requests
 from langchain.chat_models.base import BaseChatModel
@@ -36,55 +36,61 @@ class Llama31ChatModel(BaseChatModel):
     @property
     def _llm_type(self) -> str:
         return "llama31"
+    
+    def _prepare_headers(self) -> Dict[str, str]:
+        return {
+            "Authorization": f"Bearer {self.api_key}",
+            "Content-Type": "application/json",
+        }
+
+    def _prepare_context(self, messages: List[BaseMessage]) -> List[Dict[str, str]]:
+        role_map = {
+            HumanMessage: "user",
+            AIMessage: "assistant",
+            SystemMessage: "system"
+        }
+        
+        return [{"role": role_map.get(type(message), "user"), "content": message.content} for message in messages]
+
+    def _prepare_payload(
+        self,
+        context: List[Dict[str, str]],
+        stop: Optional[List[str]] = None,
+        **kwargs: Any
+    ) -> Dict[str, Any]:
+        payload = {
+            "model": self.model,
+            "messages": context,
+            "temperature": kwargs.get("temperature", self.temperature),
+            "max_tokens": kwargs.get("max_tokens", self.max_tokens),
+        }
+        if stop is not None:
+            payload["stop"] = stop
+        return payload
 
     def _generate(
         self,
         messages: List[BaseMessage],
         stop: Optional[List[str]] = None,
-        run_manager: Optional[Any] = None,
         **kwargs: Any,
     ) -> ChatResult:
-        headers = {
-            "Authorization": f"Bearer {self.api_key}",
-            "Content-Type": "application/json",
-        }
+        headers = self._prepare_headers()
+        context = self._prepare_context(messages)
+        payload = self._prepare_payload(context, stop, **kwargs)
 
-        # Convert messages to format expected by the API
-        context = []
-        for message in messages:
-            match message:
-                case HumanMessage():
-                    role = "user"
-                case AIMessage():
-                    role = "assistant"
-                case SystemMessage():
-                    role = "system"
-                case _:
-                    role = "user"
-            context.append({"role": role, "content": message.content})
-
-        payload = {
-            "model": self.model,
-            "messages": context,
-            "temperature": self.temperature,
-            "max_tokens": self.max_tokens,
-        }
-
-        if stop is not None:
-            payload["stop"] = stop
-
-        response = requests.post(
-            f"{self.base_url}/chat/completions",
-            headers=headers,
-            json=payload,
-        )
-
-        if response.status_code == 200:
+        try:
+            response = requests.post(
+                f"{self.base_url}/chat/completions",
+                headers=headers,
+                json=payload,
+            )
+            response.raise_for_status()
             assistant_response = response.json()["choices"][0]["message"]["content"]
             self._logger.info("REQUEST: %s", payload)
             self._logger.info("RESPONSE: %s", assistant_response)
             ai_message = AIMessage(content=assistant_response)
             generation = ChatGeneration(message=ai_message)
             return ChatResult(generations=[generation])
-        else:
-            response.raise_for_status()
+        except requests.RequestException as e:
+            self._logger.error("API request failed: %s", e)
+            raise RuntimeError(f"API request failed: {e}")
