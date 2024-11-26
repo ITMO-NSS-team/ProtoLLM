@@ -1,0 +1,22 @@
+version: '3.5'
+
+services:
+  api:
+    container_name: proto_llm-llm-api
+    image: proto_llm-llm-api-image
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "6672:6672"
+    environment:
+      CELERY_BROKER_URL: amqp://admin:admin@localhost:5672/
+      CELERY_RESULT_BACKEND: redis://localhost:6379/0
+      REDIS_HOST: localhost
+      REDIS_PORT: 6379
+      RABBIT_MQ_HOST: localhost
+      RABBIT_MQ_PORT: 5672
+      RABBIT_MQ_LOGIN: admin
+      RABBIT_MQ_PASSWORD: admin
+    volumes:
+      - ./unit_config.json:/docker-entrypoint.d/unit_config.json

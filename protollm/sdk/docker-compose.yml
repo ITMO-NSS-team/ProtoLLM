@@ -1,0 +1,80 @@
+version: '3.5'
+
+services:
+  rabbitmq:
+    image: "rabbitmq:3-management"
+    ports:
+      - "5672:5672"   # RabbitMQ broker port
+      - "15672:15672" # RabbitMQ management interface
+    environment:
+      - RABBITMQ_DEFAULT_USER=admin
+      - RABBITMQ_DEFAULT_PASS=admin
+    volumes:
+      - "rabbitmq_data:/var/lib/rabbitmq"
+    networks:
+      - llm_wrap_network
+
+  redis:
+    image: "redis:alpine"
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/var/lib/data
+    networks:
+      - llm_wrap_network
+
+  celery_worker:
+    build: ../../protollm/sdk
+    depends_on:
+      - rabbitmq
+      - redis
+    networks:
+      - llm_wrap_network
+    environment:
+      - CELERY_BROKER_URL=amqp://admin:admin@rabbitmq:5672/
+      - CELERY_RESULT_BACKEND=redis://redis:6379/0
+      - C_FORCE_ROOT=True
+      - PROTO_LLM_LLM_API_HOST=localhost
+      - PROTO_LLM_LLM_API_PORT=6672
+      - PROTO_LLM_TEXT_EMB_HOST=localhost
+      - PROTO_LLM_TEXT_EMB_PORT=9942
+      - PROTO_LLM_REDIS_HOST=redis
+      - PROTO_LLM_REDIS_PORT=6379
+      - PROTO_LLM_RABBIT_HOST=rabbitmq
+      - PROTO_LLM_RABBIT_PORT=5672
+      - PROTO_LLM_VECTOR_HOST=localhost
+      - PROTO_LLM_VECTOR_PORT=9941
+    command: celery -A sdk.celery.app worker --loglevel=info
+
+  flower:
+    build: ../../protollm/sdk
+    ports:
+      - "7672:7672"
+    depends_on:
+      - rabbitmq
+      - celery_worker
+    networks:
+      - llm_wrap_network
+    environment:
+      - CELERY_BROKER_URL=amqp://admin:admin@rabbitmq:5672/
+      - CELERY_RESULT_BACKEND=redis://redis:6379/0
+      - PROTO_LLM_LLM_API_HOST=localhost
+      - PROTO_LLM_LLM_API_PORT=6672
+      - PROTO_LLM_TEXT_EMB_HOST=localhost
+      - PROTO_LLM_TEXT_EMB_PORT=9942
+      - PROTO_LLM_REDIS_HOST=redis
+      - PROTO_LLM_REDIS_PORT=6379
+      - PROTO_LLM_RABBIT_HOST=rabbitmq
+      - PROTO_LLM_RABBIT_PORT=5672
+      - PROTO_LLM_VECTOR_HOST=localhost
+      - PROTO_LLM_VECTOR_PORT=9941
+    command: sh -c "sleep 20 && celery -A sdk.celery.app flower --broker=amqp://guest:guest@rabbitmq:5672/ --port=7672"
+
+volumes:
+  rabbitmq_data:
+  redis_data:
+
+networks:
+  llm_wrap_network:
+    name: llm_wrap_network
+    driver: bridge

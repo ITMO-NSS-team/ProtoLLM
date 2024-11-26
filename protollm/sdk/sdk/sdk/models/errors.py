@@ -1,0 +1,4 @@
+
+
+class RedisWaitItemTimeoutError(TimeoutError):
+    pass
