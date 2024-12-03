@@ -2,7 +2,7 @@
 name = "ProtoLLM"
 version = "0.1.0"
 description = ""
-authors = [""]
+authors = ["aimclub"]
 readme = "README.rst"
 
 
