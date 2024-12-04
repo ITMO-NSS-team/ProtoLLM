@@ -1,0 +1,22 @@
+version: '3.5'
+
+services:
+  api:
+    container_name: stairs-llm-api
+    image: stairs-llm-api-image
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "6672:6672"
+    environment:
+      CELERY_BROKER_URL: amqp://admin:admin@10.32.15.21:5672/
+      CELERY_RESULT_BACKEND: redis://10.32.15.21:6379/0
+      REDIS_HOST: 10.32.15.21
+      REDIS_PORT: 6379
+      RABBIT_MQ_HOST: 10.32.15.21
+      RABBIT_MQ_PORT: 5672
+      RABBIT_MQ_LOGIN: admin
+      RABBIT_MQ_PASSWORD: admin
+    volumes:
+      - ./unit_config.json:/docker-entrypoint.d/unit_config.json
