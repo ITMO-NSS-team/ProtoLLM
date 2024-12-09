@@ -1,0 +1,1 @@
+from docs_processing.parsing.parsers.word_doc.xml.xml_processing import process_paragraph_body

@@ -1,0 +1,1 @@
+from protollm.docs_processing.parsing.parsers.word_doc.word_doc_parser import WordDocumentParser
