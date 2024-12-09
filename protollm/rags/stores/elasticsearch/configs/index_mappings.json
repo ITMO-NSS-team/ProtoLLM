@@ -1,0 +1,35 @@
+{
+    "properties": {
+        "paragraph": {"type": "text", "analyzer": "russian_analyzer"},
+        "metadata": {
+            "properties": {
+                "doc_idx": {
+                    "type": "float"
+                },
+                "paragraph_number": {
+                    "type": "text"
+                },
+                "doc_name": {
+                    "type": "text",
+                    "analyzer": "russian_analyzer"
+                },
+                "title_0": {
+                    "type": "text",
+                    "analyzer": "russian_analyzer"
+                },
+                "title_1": {
+                    "type": "text",
+                    "analyzer": "russian_analyzer"
+                },
+                "title_2": {
+                    "type": "text",
+                    "analyzer": "russian_analyzer"
+                },
+                "title_3": {
+                    "type": "text",
+                    "analyzer": "russian_analyzer"
+                }
+            }
+        }
+    }
+}
