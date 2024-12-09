@@ -1,0 +1,35 @@
+version: '3.8'
+
+services:
+  llm:
+    container_name: stairs-llm-q4
+    image: stairs-llm-image:latest
+    runtime: nvidia
+    deploy:
+      resources:
+        limits:
+          # cpus: 5
+          memory: 80G
+    build:
+      context: ..
+      dockerfile: Dockerfile
+    environment:
+      MODEL_PATH: /model_data/Meta-Llama-3.1-70B-Instruct.Q4_K_M.gguf
+      NVIDIA_VISIBLE_DEVICES: 'GPU-c624b4e0-f383-df3a-3cc1-4c3b797558e5, GPU-aeeae707-d2ff-94ba-f8b2-a9692669101c'
+      REDIS_HOST: 10.32.15.21
+      REDIS_PORT: 6379
+      CMAKE_ARGS: "-DLLAMA_CUBLAS=on"
+      FORCE_CMAKE: 1
+      QUEUE_NAME: stairs-llm-q4-queue
+    volumes:
+      - /var/dockerstorage/docker-yaksenkin-202205041035/PROTO_LLM/data:/model_data
+    ports:
+      - "8670:8672"
+    networks:
+      - llm_wrap_network
+    restart: unless-stopped
+
+networks:
+  llm_wrap_network:
+    name: llm_wrap_network
+    driver: bridge
