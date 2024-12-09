@@ -14,7 +14,7 @@ COPY requirements.txt ./requirements.txt
 
 RUN pip install -r requirements.txt
 
-COPY stairs_llm_core .
+COPY protollm_llm_core .
 
 
 CMD python3 main.py

@@ -4,8 +4,8 @@ from protollm_sdk.models.job_context_models import PromptModel, ChatCompletionMo
     ChatCompletionTransactionModel, PromptTypes
 from vllm import LLM, SamplingParams
 
-from stairs_llm_core.config import GPU_MEMORY_UTILISATION, TENSOR_PARALLEL_SIZE, TOKENS_LEN
-from stairs_llm_core.models.base import BaseLLM
+from protollm_llm_core.config import GPU_MEMORY_UTILISATION, TENSOR_PARALLEL_SIZE, TOKENS_LEN
+from protollm_llm_core.models.base import BaseLLM
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)

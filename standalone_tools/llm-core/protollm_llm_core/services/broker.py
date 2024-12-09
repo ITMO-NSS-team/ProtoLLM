@@ -7,13 +7,13 @@ from protollm_sdk.models.job_context_models import PromptModel, ChatCompletionMo
     PromptWrapper, ChatCompletionTransactionModel
 from protollm_sdk.object_interface.redis_wrapper import RedisWrapper
 
-from stairs_llm_core.config import (
+from protollm_llm_core.config import (
     RABBIT_MQ_HOST, RABBIT_MQ_PORT,
     RABBIT_MQ_PASSWORD, RABBIT_MQ_LOGIN,
     REDIS_PREFIX
 )
-from stairs_llm_core.config import REDIS_HOST, REDIS_PORT, MODEL_PATH, QUEUE_NAME
-from stairs_llm_core.models.base import BaseLLM
+from protollm_llm_core.config import REDIS_HOST, REDIS_PORT, MODEL_PATH, QUEUE_NAME
+from protollm_llm_core.models.base import BaseLLM
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)

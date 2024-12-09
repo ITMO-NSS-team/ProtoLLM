@@ -15,6 +15,7 @@ class OuterLLMAPI:
 
     def __init__(
             self,
+            key: str,
             timeout_sec: int = 10 * 60,
     ):
         """
@@ -24,7 +25,7 @@ class OuterLLMAPI:
         :type timeout_sec: int
         """
         self.model = "openai/gpt-4o-2024-08-06"
-        self.key = "sk-or-vv-c49f40fdb086053ec32c6ae2723b8d222cb7767f3b98527e7ae282986e7d33ed"  # TODO add config
+        self.key = key
         self.timeout_sec = timeout_sec
         self.client = OpenAI(
             api_key=self.key,

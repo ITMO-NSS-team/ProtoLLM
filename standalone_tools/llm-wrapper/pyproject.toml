@@ -1,5 +1,5 @@
 [tool.poetry]
-name = "stairs-llm-api"
+name = "protollm-llm-api"
 version = "0.3.0"
 description = ""
 authors = [""]

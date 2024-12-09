@@ -10,7 +10,7 @@ from protollm_sdk.models.job_context_models import PromptModel, ResponseModel, C
 
 @pytest.fixture
 def outer_llm_api():
-    return OuterLLMAPI()
+    return OuterLLMAPI("key")
 
 
 @pytest.fixture
@@ -21,7 +21,7 @@ def mock_openai():
 
 
 def test_outer_llmapi_initialization():
-    outer_llm_api = OuterLLMAPI()
+    outer_llm_api = OuterLLMAPI("key")
     assert outer_llm_api.model == "openai/gpt-4o-2024-08-06"
     assert outer_llm_api.timeout_sec == 10 * 60
     assert isinstance(outer_llm_api.client.api_key, str)

@@ -20,7 +20,7 @@ def construct_job_context(job_name: str, abstract_task=None) -> JobContext:
 
     llm_api = LLMAPI(Config.llm_api_host, Config.llm_api_port)
 
-    out_llm_api = OuterLLMAPI()
+    out_llm_api = OuterLLMAPI(Config.outer_llm_key)
 
     text_embedder = TextEmbedder(Config.text_embedder_host, Config.text_embedder_port)
 
