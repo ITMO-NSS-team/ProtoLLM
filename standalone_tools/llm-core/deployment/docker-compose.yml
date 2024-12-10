@@ -2,8 +2,8 @@ version: '3.8'
 
 services:
   llm:
-    container_name: <your_container_name>
-    image: <your_image_name>:latest
+    container_name: llm-core
+    image: llm-core:latest
     runtime: nvidia
     deploy:
       resources:
