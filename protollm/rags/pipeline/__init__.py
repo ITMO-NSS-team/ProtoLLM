@@ -1,0 +1,1 @@
+from stairs_rag.pipeline.etl_pipeline import DocsLoadPipeline, DocsTransformPipeline, DocsExtractPipeline
