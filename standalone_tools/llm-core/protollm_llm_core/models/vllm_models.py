@@ -5,14 +5,16 @@ from protollm_sdk.models.job_context_models import PromptModel, ChatCompletionMo
 from vllm import LLM, SamplingParams
 
 from protollm_llm_core.config import GPU_MEMORY_UTILISATION, TENSOR_PARALLEL_SIZE, TOKENS_LEN
-from protollm_llm_core.models.base import BaseLLM
+from protollm_llm_core.models.base import BaseLLM, LocalLLM
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 
-class VllMModel(BaseLLM):
+class VllMModel(LocalLLM, BaseLLM):
     def __init__(self, model_path, n_ctx=8192):
+        super().__init__(model_path)
+
         self.model = LLM(
             model=model_path,
             tensor_parallel_size=TENSOR_PARALLEL_SIZE,

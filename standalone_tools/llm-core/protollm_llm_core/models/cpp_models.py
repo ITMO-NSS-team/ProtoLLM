@@ -4,14 +4,15 @@ from llama_cpp import Llama
 from protollm_sdk.models.job_context_models import PromptModel, ChatCompletionModel, PromptTransactionModel, \
     ChatCompletionTransactionModel, PromptTypes
 
-from protollm_llm_core.models.base import BaseLLM
+from protollm_llm_core.models.base import BaseLLM, LocalLLM
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 
-class CppModel(BaseLLM):
+class CppModel(LocalLLM ,BaseLLM):
     def __init__(self, model_path, n_ctx=8192):
+        super().__init__(model_path)
 
         self.model = Llama(
             model_path=model_path,

@@ -7,25 +7,29 @@ from protollm_sdk.models.job_context_models import PromptModel, ChatCompletionMo
     PromptWrapper, ChatCompletionTransactionModel
 from protollm_sdk.object_interface.redis_wrapper import RedisWrapper
 
-from protollm_llm_core.config import (
-    RABBIT_MQ_HOST, RABBIT_MQ_PORT,
-    RABBIT_MQ_PASSWORD, RABBIT_MQ_LOGIN,
-    REDIS_PREFIX
-)
-from protollm_llm_core.config import REDIS_HOST, REDIS_PORT, MODEL_PATH, QUEUE_NAME
 from protollm_llm_core.models.base import BaseLLM
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 
-class LLM_wrap:
+class LLMWrap:
 
-    def __init__(self, llm_model: Type[BaseLLM]):
-        self.llm = llm_model(model_path=MODEL_PATH)
+    def __init__(self,
+                 llm_model: BaseLLM,
+                 redis_host: str,
+                 redis_port: str,
+                 queue_name: str,
+                 rabbit_host: str,
+                 rabbit_port: str,
+                 rabbit_login: str,
+                 rabbit_password: str,
+                 redis_prefix: str):
+        self.llm = llm_model
         logger.info('Loaded model')
 
-        self.redis_bd = RedisWrapper(REDIS_HOST, REDIS_PORT)
+        self.redis_bd = RedisWrapper(redis_host, redis_port)
+        self.redis_prefix = redis_prefix
         logger.info('connected to redis')
 
         self.models = {
@@ -33,15 +37,21 @@ class LLM_wrap:
             'chat_completion': ChatCompletionModel,
         }
 
+        self.queue_name = queue_name
+        self.rabbit_host = rabbit_host
+        self.rabbit_port = rabbit_port
+        self.rabbit_login = rabbit_login
+        self.rabbit_password = rabbit_password
+
     def start_connection(self):
         connection = pika.BlockingConnection(
             pika.ConnectionParameters(
-                host=RABBIT_MQ_HOST,
-                port=RABBIT_MQ_PORT,
+                host=self.rabbit_host,
+                port=self.rabbit_port,
                 virtual_host='/',
                 credentials=pika.PlainCredentials(
-                    username=RABBIT_MQ_LOGIN,
-                    password=RABBIT_MQ_PASSWORD
+                    username=self.rabbit_login,
+                    password=self.rabbit_password
                 )
             )
         )
@@ -49,12 +59,12 @@ class LLM_wrap:
         channel = connection.channel()
         logger.info('connected to the broker')
 
-        channel.queue_declare(queue=QUEUE_NAME)
+        channel.queue_declare(queue=self.queue_name)
         logger.info('A queue has been announced')
 
         channel.basic_consume(
             on_message_callback=self._callback,
-            queue=QUEUE_NAME,
+            queue=self.queue_name,
             auto_ack=True
         )
 
@@ -71,6 +81,6 @@ class LLM_wrap:
         func_result = self.llm(transaction)
 
         logger.info(f'The llm response on the task {transaction.prompt.job_id} has been generated')
-        logger.info(f'{REDIS_PREFIX}:{transaction.prompt.job_id}\n {func_result}')
-        self.redis_bd.save_item(f'{REDIS_PREFIX}:{transaction.prompt.job_id}', {"content": func_result})
+        logger.info(f'{self.redis_prefix}:{transaction.prompt.job_id}\n {func_result}')
+        self.redis_bd.save_item(f'{self.redis_prefix}:{transaction.prompt.job_id}', {"content": func_result})
         logger.info(f'The response on the task {transaction.prompt.job_id} was written in radish')

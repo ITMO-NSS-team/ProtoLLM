@@ -26,7 +26,7 @@ def test_outer_llmapi_initialization():
     assert outer_llm_api.timeout_sec == 10 * 60
     assert isinstance(outer_llm_api.client.api_key, str)
     assert len(outer_llm_api.client.api_key) == len(
-        "sk-or-vv-c49f40fdb086053ec32c6ae2723b8d222cb7767f3b98527e7ae282986e7d33ed")
+        "key")
     assert outer_llm_api.client.base_url == URL("https://api.vsegpt.ru/v1/")
 
 
