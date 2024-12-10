@@ -8,8 +8,6 @@ RUN apt install git -y
 RUN apt install build-essential -y
 RUN apt install gcc-11 g++-11 -y
 
-
-RUN CMAKE_ARGS="-DGGML_CUDA=on" pip install llama-cpp-python
 COPY requirements.txt ./requirements.txt
 
 RUN pip install -r requirements.txt

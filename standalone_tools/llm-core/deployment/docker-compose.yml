@@ -2,8 +2,8 @@ version: '3.8'
 
 services:
   llm:
-    container_name: stairs-llm-llama31-int4
-    image: stairs-llm-image:latest
+    container_name: <your_container_name>
+    image: <your_image_name>:latest
     runtime: nvidia
     deploy:
       resources:
@@ -13,66 +13,22 @@ services:
     build:
       context: ..
       dockerfile: Dockerfile
-    env_file: cluster.env
+    env_file: .env
     environment:
       TOKENS_LEN: 16384
       GPU_MEMORY_UTILISATION: 0.9
       TENSOR_PARALLEL_SIZE: 2
-      MODEL_PATH: /data/Meta-Llama-3.1-70B-Instruct-AWQ-INT4
-      NVIDIA_VISIBLE_DEVICES: 'GPU-a4b91d8b-d8f9-f249-4186-c569b418da6c, GPU-ce280438-3cac-7dd0-af3a-bf24cc9d9f58'
-#      NVIDIA_VISIBLE_DEVICES: 'GPU-da373b2c-0664-65c5-e348-c0c4b519f2a8, GPU-9a45093d-6d87-cfa5-7955-8182fa5146f0'
-      REDIS_HOST: 10.32.15.21
-      REDIS_PORT: 6379
-      CMAKE_ARGS: "-DLLAMA_CUBLAS=on"
-      FORCE_CMAKE: 1
+      MODEL_PATH: /data/<your_path_to_model>
+      NVIDIA_VISIBLE_DEVICES: <your_GPUs>
     volumes:
-      - /var/lib/docker/stairs-llm:/data
+      - <your_path_to_data_in_docker>:/data
     ports:
       - "8677:8672"
     networks:
       - llm_wrap_network
     restart: unless-stopped
 
-  llm-2:
-    container_name: stairs-llm-llama31-int4_2
-    image: stairs-llm-image:latest
-    runtime: nvidia
-    deploy:
-      resources:
-        limits:
-          # cpus: 5
-          memory: 80G
-    build:
-      context: ..
-      dockerfile: Dockerfile
-    env_file: cluster.env
-    environment:
-      MODEL_PATH: /data/Meta-Llama-3.1-70B-Instruct-AWQ-INT4
-      TOKENS_LEN: 16384
-      TENSOR_PARALLEL_SIZE: 2
-      GPU_MEMORY_UTILISATION: 0.9
-#      NVIDIA_VISIBLE_DEVICES: 'GPU-9a45093d-6d87-cfa5-7955-8182fa5146f0, GPU-c93ad4c5-54c6-26c2-30eb-f63ba4aadd70, GPU-d331eb4a-4863-d24a-3e4a-1a66b4f161a9, GPU-3967a556-6c12-7322-cd61-1ef69a1a3e78'
-      NVIDIA_VISIBLE_DEVICES: 'GPU-009e26fc-8cc4-47bc-51a5-017553abac33, GPU-da373b2c-0664-65c5-e348-c0c4b519f2a8'
-      REDIS_HOST: 10.32.15.21
-      REDIS_PORT: 6379
-      CMAKE_ARGS: "-DLLAMA_CUBLAS=on"
-      FORCE_CMAKE: 1
-    volumes:
-      - /var/lib/docker/stairs-llm:/data
-    ports:
-      - "8670:8672"
-    networks:
-      - llm_wrap_network
-    restart: unless-stopped
-#
 networks:
   llm_wrap_network:
     name: llm_wrap_network
     driver: bridge
-
-
-#/data/llama_8b/llama3_8b_fc.gguf
-#/data/Meta-Llama-3.1-70B-Instruct
-#/data/Meta-Llama-3.1-70B-Instruct-Q8-gguf/Meta-Llama-3.1-70B-Q_8.gguf
-#/data/Meta-Llama-3.1-70B-Instruct-AWQ-INT4
-#/data/Qwen2-72B-Instruct-GPTQ-Int4
