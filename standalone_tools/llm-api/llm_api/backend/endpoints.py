@@ -23,9 +23,9 @@ def get_router(config: Config) -> APIRouter:
 
     @router.post('/generate', response_model=ResponseModel)
     async def generate(prompt_data: PromptModel, queue_name: str = config.queue_name):
-        transaction_model = PromptTransactionModel(
-            prompt=prompt_data,
-            prompt_type=PromptTypes.SINGLE_GENERATION.value
+        transaction_model = ChatCompletionTransactionModel(
+            prompt=ChatCompletionModel.from_prompt_model(prompt_data),
+            prompt_type=PromptTypes.CHAT_COMPLETION.value
         )
         await send_task(config, queue_name, transaction_model)
         logger.info(f"Task {prompt_data.job_id} was sent to LLM.")
