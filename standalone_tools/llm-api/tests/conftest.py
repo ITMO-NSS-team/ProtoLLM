@@ -1,6 +1,6 @@
 import pytest
 
-from llm_api.config import Config
+from protollm_api.config import Config
 
 
 @pytest.fixture(scope="module")

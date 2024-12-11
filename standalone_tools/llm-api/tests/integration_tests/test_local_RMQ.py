@@ -6,7 +6,7 @@ import pytest
 from protollm_sdk.models.job_context_models import (ChatCompletionModel, PromptMeta, ChatCompletionUnit,
                                                       ChatCompletionTransactionModel, PromptTypes)
 
-from llm_api.backend.broker import send_task
+from protollm_api.backend.broker import send_task
 
 
 @pytest.fixture(scope="module")

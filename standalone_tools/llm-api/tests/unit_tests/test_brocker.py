@@ -6,7 +6,7 @@ import pytest
 from protollm_sdk.models.job_context_models import ResponseModel, ChatCompletionTransactionModel, ChatCompletionModel, \
     PromptMeta, ChatCompletionUnit, PromptTypes
 
-from llm_api.backend.broker import send_task, get_result
+from protollm_api.backend.broker import send_task, get_result
 
 
 @pytest.mark.asyncio
@@ -18,7 +18,7 @@ async def test_send_task(test_local_config):
     )
     transaction = ChatCompletionTransactionModel(prompt=prompt, prompt_type=PromptTypes.CHAT_COMPLETION.value)
 
-    with patch("llm_api.backend.broker.pika.BlockingConnection") as mock_connection:
+    with patch("protollm_api.backend.broker.pika.BlockingConnection") as mock_connection:
         mock_channel = MagicMock()
         mock_connection.return_value.channel.return_value = mock_channel
 

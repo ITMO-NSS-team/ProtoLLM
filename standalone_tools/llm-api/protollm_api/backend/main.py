@@ -1,6 +1,6 @@
 from fastapi import FastAPI
-from llm_api.config import Config
-from llm_api.backend.endpoints import get_router
+from protollm_api.config import Config
+from protollm_api.backend.endpoints import get_router
 
 app = FastAPI()
 

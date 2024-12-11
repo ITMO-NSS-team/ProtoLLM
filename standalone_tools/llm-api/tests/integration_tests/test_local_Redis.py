@@ -5,7 +5,7 @@ import pytest
 from protollm_sdk.models.job_context_models import ResponseModel
 from protollm_sdk.object_interface.redis_wrapper import RedisWrapper
 
-from llm_api.backend.broker import get_result
+from protollm_api.backend.broker import get_result
 
 
 @pytest.fixture(scope="module")

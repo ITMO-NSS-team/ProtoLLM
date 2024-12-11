@@ -12,7 +12,7 @@ COPY requirements.txt ./requirements.txt
 
 RUN pip install -r requirements.txt
 
-COPY protollm_llm_core .
+COPY protollm_worker .
 
 
 CMD python3 main.py

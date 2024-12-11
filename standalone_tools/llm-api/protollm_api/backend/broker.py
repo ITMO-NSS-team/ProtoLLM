@@ -2,7 +2,7 @@ import pika
 import logging
 import json
 
-from llm_api.config import Config
+from protollm_api.config import Config
 from protollm_sdk.models.job_context_models import (
     ResponseModel, ChatCompletionTransactionModel, PromptTransactionModel)
 from protollm_sdk.utils.reddis import RedisWrapper

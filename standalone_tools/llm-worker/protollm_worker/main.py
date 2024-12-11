@@ -1,7 +1,7 @@
-from protollm_llm_core.config import MODEL_PATH, REDIS_HOST, REDIS_PORT, QUEUE_NAME
-from protollm_llm_core.models.vllm_models import VllMModel
-from protollm_llm_core.services.broker import LLMWrap
-from protollm_llm_core.config import (
+from protollm_worker.config import MODEL_PATH, REDIS_HOST, REDIS_PORT, QUEUE_NAME
+from protollm_worker.models.vllm_models import VllMModel
+from protollm_worker.services.broker import LLMWrap
+from protollm_worker.config import (
     RABBIT_MQ_HOST, RABBIT_MQ_PORT,
     RABBIT_MQ_PASSWORD, RABBIT_MQ_LOGIN,
     REDIS_PREFIX

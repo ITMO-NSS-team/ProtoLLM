@@ -1,6 +1,6 @@
 [tool.poetry]
-name = "stairs-llm-core"
-version = "0.3.1"
+name = "protollm-worker"
+version = "1.0.0"
 description = ""
 authors = [""]
 readme = "README.md"

@@ -8,8 +8,8 @@ from protollm_sdk.models.job_context_models import (
 from protollm_sdk.models.job_context_models import ResponseModel
 from protollm_sdk.object_interface.redis_wrapper import RedisWrapper
 
-from llm_api.backend.broker import get_result
-from llm_api.backend.broker import send_task
+from protollm_api.backend.broker import get_result
+from protollm_api.backend.broker import send_task
 
 
 @pytest.fixture(scope="module")

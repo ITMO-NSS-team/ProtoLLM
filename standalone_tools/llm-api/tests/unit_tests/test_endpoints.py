@@ -7,7 +7,7 @@ from httpx import AsyncClient, ASGITransport
 from protollm_sdk.models.job_context_models import ResponseModel, PromptTransactionModel, PromptModel, \
     PromptTypes, ChatCompletionModel, ChatCompletionTransactionModel
 
-from llm_api.backend.endpoints import get_router
+from protollm_api.backend.endpoints import get_router
 
 
 @pytest.fixture
@@ -20,8 +20,8 @@ def test_app(test_local_config):
 @pytest.mark.asyncio
 async def test_generate_endpoint(test_app, test_local_config):
     async with AsyncClient(transport=ASGITransport(app=test_app), base_url="http://testserver") as client:
-        with patch("llm_api.backend.endpoints.send_task", new_callable=AsyncMock) as send_task_mock, \
-                patch("llm_api.backend.endpoints.get_result", new_callable=AsyncMock) as get_result_mock:
+        with patch("protollm_api.backend.endpoints.send_task", new_callable=AsyncMock) as send_task_mock, \
+                patch("protollm_api.backend.endpoints.get_result", new_callable=AsyncMock) as get_result_mock:
             get_result_mock.return_value = ResponseModel(content="Test Response")
 
             prompt = {
@@ -43,9 +43,9 @@ async def test_generate_endpoint(test_app, test_local_config):
             )
 
             prompt_data = PromptModel.model_validate_json(json.dumps(prompt))
-            transaction_model = PromptTransactionModel(
-                prompt=prompt_data,
-                prompt_type=PromptTypes.SINGLE_GENERATION.value
+            transaction_model = ChatCompletionTransactionModel(
+                prompt=ChatCompletionModel.from_prompt_model(prompt_data),
+                prompt_type=PromptTypes.CHAT_COMPLETION.value
             )
             send_task_mock.assert_called_once_with(test_local_config, "llm-api-queue", transaction_model)
 
@@ -58,8 +58,8 @@ async def test_generate_endpoint(test_app, test_local_config):
 @pytest.mark.asyncio
 async def test_chat_completion_endpoint(test_app, test_local_config):
     async with AsyncClient(transport=ASGITransport(app=test_app), base_url="http://testserver") as client:
-        with patch("llm_api.backend.endpoints.send_task", new_callable=AsyncMock) as send_task_mock, \
-                patch("llm_api.backend.endpoints.get_result", new_callable=AsyncMock) as get_result_mock:
+        with patch("protollm_api.backend.endpoints.send_task", new_callable=AsyncMock) as send_task_mock, \
+                patch("protollm_api.backend.endpoints.get_result", new_callable=AsyncMock) as get_result_mock:
             get_result_mock.return_value = ResponseModel(content="Test Response")
 
             prompt = {

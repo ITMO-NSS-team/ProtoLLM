@@ -6,7 +6,7 @@ from protollm_sdk.models.job_context_models import PromptModel, ChatCompletionMo
     PromptWrapper, ChatCompletionTransactionModel
 from protollm_sdk.object_interface.redis_wrapper import RedisWrapper
 
-from protollm_llm_core.models.base import BaseLLM
+from protollm_worker.models.base import BaseLLM
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)

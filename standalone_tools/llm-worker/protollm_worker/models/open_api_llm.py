@@ -1,7 +1,7 @@
 import logging
 from time import sleep
 
-from protollm_llm_core.models.base import APIlLLM, BaseLLM
+from protollm_worker.models.base import APIlLLM, BaseLLM
 from protollm_sdk.models.job_context_models import PromptTypes, PromptTransactionModel, ChatCompletionTransactionModel, \
     PromptModel, ChatCompletionModel
 from openai import OpenAI

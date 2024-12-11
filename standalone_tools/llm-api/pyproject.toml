@@ -1,6 +1,6 @@
 [tool.poetry]
-name = "protollm-llm-api"
-version = "0.3.0"
+name = "protollm-api"
+version = "1.0.0"
 description = ""
 authors = [""]
 readme = "README.md"

@@ -1,7 +1,7 @@
 import logging
 from fastapi import APIRouter
-from llm_api.backend.broker import send_task, get_result
-from llm_api.config import Config
+from protollm_api.backend.broker import send_task, get_result
+from protollm_api.config import Config
 from protollm_sdk.models.job_context_models import (
     PromptModel, ResponseModel, ChatCompletionModel,
     PromptTransactionModel, ChatCompletionTransactionModel,

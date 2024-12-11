@@ -1,6 +1,6 @@
 FROM nginx/unit:1.28.0-python3.10
 
-COPY llm_api /app/llm_api
+COPY protollm_api /app/llm_api
 COPY requirements.txt /app
 COPY unit_config.json /docker-entrypoint.d/config.json
 WORKDIR /app

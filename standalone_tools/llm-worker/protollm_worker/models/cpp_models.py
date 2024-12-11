@@ -4,7 +4,7 @@ from llama_cpp import Llama
 from protollm_sdk.models.job_context_models import PromptModel, ChatCompletionModel, PromptTransactionModel, \
     ChatCompletionTransactionModel, PromptTypes
 
-from protollm_llm_core.models.base import BaseLLM, LocalLLM
+from protollm_worker.models.base import BaseLLM, LocalLLM
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
