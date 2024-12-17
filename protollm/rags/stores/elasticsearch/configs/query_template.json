@@ -1,0 +1,12 @@
+{
+    "multi_match": {
+        "query": "",
+        "type": "most_fields",
+        "fields": ["doc_name",
+                   "title_0",
+                   "title_1",
+                   "title_2",
+                   "title_3^2",
+                   "paragraph^3"]
+    }
+}
