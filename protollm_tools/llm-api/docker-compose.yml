@@ -10,8 +10,6 @@ services:
     ports:
       - "6672:6672"
     environment:
-      CELERY_BROKER_URL: amqp://admin:admin@10.32.15.21:5672/
-      CELERY_RESULT_BACKEND: redis://10.32.15.21:6379/0
       REDIS_HOST: redis
       REDIS_PORT: 6379
       RABBIT_MQ_HOST: rabbitmq
@@ -49,3 +47,7 @@ networks:
   llm_wrap_network:
     name: llm_wrap_network
     driver: bridge
+
+volumes:
+  rabbitmq_data:
+  redis_data:

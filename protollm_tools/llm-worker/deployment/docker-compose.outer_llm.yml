@@ -1,0 +1,20 @@
+version: '3.8'
+
+services:
+  app:
+    container_name: python-main-app
+    build:
+      context: ..
+      dockerfile: Dockerfile.outer_llm
+      args:
+        LLM_MODEL: open_api_llm
+    networks:
+      - llm_wrap_network
+    ports:
+      - "8000:8000"
+    restart: unless-stopped
+
+networks:
+  llm_wrap_network:
+    name: llm_wrap_network
+    driver: bridge

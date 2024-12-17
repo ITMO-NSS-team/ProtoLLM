@@ -20,8 +20,6 @@ services:
       TENSOR_PARALLEL_SIZE: 2
       MODEL_PATH: /data/<your_path_to_model>
       NVIDIA_VISIBLE_DEVICES: <your_GPUs>
-    volumes:
-      - <your_path_to_data_in_docker>:/data
     ports:
       - "8677:8672"
     networks:

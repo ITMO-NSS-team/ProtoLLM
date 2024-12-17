@@ -15,7 +15,7 @@ class OpenAPILLM(APIlLLM, BaseLLM):
     Handles both single-prompt generations and chat completions.
     """
 
-    def __init__(self, model_url: str, token: str, default_model: str = None, timeout_sec: int = 10 * 60):
+    def __init__(self, model_url: str, token: str, app_tag: str = None, default_model: str = None, timeout_sec: int = 10 * 60):
         """
         Initialize the OpenAPILLM with API credentials and default parameters.
 
@@ -23,16 +23,19 @@ class OpenAPILLM(APIlLLM, BaseLLM):
         :type model_url: str
         :param token: API key for authentication.
         :type token: str
+        :param app_tag: Needed to determine the source of the request.
+        :type app_tag: str
         :param default_model: Default model name to use for completions (optional).
         :type default_model: str
         :param timeout_sec: Timeout for API requests in seconds (default is 10 minutes).
         :type timeout_sec: int
         """
-        super().__init__(model_url)
+        super().__init__(model_url, token)
 
         self.model = default_model
         self.token = token
         self.timeout_sec = timeout_sec
+        self.app_tag = app_tag
         self.client = OpenAI(
             api_key=token,
             base_url=model_url
@@ -78,13 +81,15 @@ class OpenAPILLM(APIlLLM, BaseLLM):
         """
         sleep(1)  # Throttling to adhere to GPT rate limits
         model = model or self.model
+        extra_headers = {"X-Title": self.app_tag} if self.app_tag is not None else None
         response = self.client.chat.completions.create(
             model=model,
             messages=messages,
             temperature=temperature,
             n=1,
             max_tokens=tokens_limit,
-            timeout=self.timeout_sec)
+            timeout=self.timeout_sec,
+            extra_headers=extra_headers)
 
         result = response.choices[0].message.content
         logger.info(result)

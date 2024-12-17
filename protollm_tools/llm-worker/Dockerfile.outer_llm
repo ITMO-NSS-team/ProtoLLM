@@ -1,0 +1,18 @@
+FROM python:3.10-slim
+
+ARG LLM_MODEL=base
+
+COPY requirements_outer_llm.txt ./requirements_outer_llm.txt
+RUN pip install --no-cache-dir -r requirements_outer_llm.txt
+
+COPY protollm_worker/__init__.py protollm_worker/__init__.py
+COPY protollm_worker/models/base.py protollm_worker/models/base.py
+COPY protollm_worker/models/__init__.py protollm_worker/models/__init__.py
+COPY protollm_worker/models/${LLM_MODEL}.py protollm_worker/models/${LLM_MODEL}.py
+
+COPY protollm_worker/services protollm_worker/services
+COPY protollm_worker/config.py protollm_worker/config.py
+COPY main.py main.py
+
+# Задаём команду для запуска
+CMD ["python", "main.py"]
