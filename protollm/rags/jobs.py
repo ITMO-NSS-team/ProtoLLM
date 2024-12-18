@@ -1,6 +1,5 @@
 import logging
 import uuid
-from dataclasses import dataclass
 from typing import Optional, List, Any, Callable
 
 import chromadb
@@ -10,13 +9,11 @@ from langchain_core.language_models import LLM
 
 from protollm_sdk.jobs.job import Job
 from protollm_sdk.jobs.job_context import JobContext
-from protollm_sdk.jobs.utility import construct_job_context
-from protollm_sdk.models.job_context_models import PromptModel, PromptMeta, ResponseModel, ChatCompletionModel, \
-    ChatCompletionUnit
+from protollm_sdk.models.job_context_models import PromptModel, PromptMeta, ResponseModel
 
-from protollm.rags.rag_core.prompt_templates import EOS, EOT
+from protollm.templates.prompt_templates.rag_prompt_templates import EOS, EOT
 from protollm.rags.rag_core.retriever import DocsSearcherModels, DocRetriever, RetrievingPipeline
-from protollm.rags.rag_core.utils import run_rag, run_multiple_rag
+from protollm.rags.rag_core.utils import run_multiple_rag
 from protollm.rags.settings.chroma_settings import settings
 
 from protollm.docs_processing.splitting.key_words_splitter import KeywordExtractor
@@ -47,7 +44,6 @@ def get_pipelines_retriever(list_retrievers: list[list[DocRetriever]], list_coll
             for retrievers, collection_names in zip(list_retrievers, list_collection_names)]
 
 
-# @dataclass
 class CustomLLM(LLM):
     ctx: JobContext = None
 
