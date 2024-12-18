@@ -1,13 +1,9 @@
+**ProtoLLM**
+
 .. start-badges
 .. list-table::
    :stub-columns: 1
 
-   * - package
-     - | |pypi| |python|
-   * - tests
-     - | |build| |integration|
-   * - docs
-     - |docs|
    * - license
      - | |license|
    * - support
@@ -89,10 +85,9 @@ of `ITMO University <https://itmo.ru/>`_ as part of the plan of the center's pro
 
 Contacts
 ========
-- `Natural System Simulation Team <https://itmo-nss-team.github.io/>`_
-- `Anna Kalyuzhnaya <https://scholar.google.com/citations?user=bjiILqcAAAAJ&hl=ru>`_, Team leader (anna.kalyuzhnaya@itmo.ru)
-- `Newsfeed <https://t.me/NSS_group>`_
-- `Youtube channel <https://www.youtube.com/channel/UC4K9QWaEUpT_p3R4FeDp5jA>`_
+- `AI Institute, ITMO <https://aim.club/>`_
+- `Anna Kalyuzhnaya <https://scholar.google.com/citations?user=bjiILqcAAAAJ&hl=ru>`_ (anna.kalyuzhnaya@itmo.ru)
+- `tg <https://t.me/protollm_helpdesk>`_
 
 Papers about ProtoLLM-based solutions:
 ========
