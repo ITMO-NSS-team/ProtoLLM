@@ -1,17 +1,24 @@
-    .. start-badges
-        .. list-table::
-           :stub-columns: 1
-               * - license
-                 - | |license|
-               * - support
-                 - | |tg|
-               * - languages
-                 - | |eng| |rus|
-               * - mirror
-                 - | |gitlab|
-               * - funding
-                 - |sai| |itmo|
-    .. end-badges
+.. start-badges
+.. list-table::
+   :stub-columns: 1
+
+   * - package
+     - | |pypi| |python|
+   * - tests
+     - | |build| |integration|
+   * - docs
+     - |docs|
+   * - license
+     - | |license|
+   * - support
+     - | |tg|
+   * - languages
+     - | |eng| |rus|
+   * - mirror
+     - | |gitlab|
+   * - funding
+     - | |ITMO| |SAI|
+.. end-badges
 
 Intro
 #####
@@ -87,6 +94,13 @@ Contacts
 - `Newsfeed <https://t.me/NSS_group>`_
 - `Youtube channel <https://www.youtube.com/channel/UC4K9QWaEUpT_p3R4FeDp5jA>`_
 
+Papers about ProtoLLM-based solutions:
+========
+- Zakharov K. et al. Forecasting Population Migration in Small Settlements Using Generative Models under Conditions of Data Scarcity //Smart Cities. – 2024. – Т. 7. – №. 5. – С. 2495-2513.
+- Kovalchuk M. A. et al. SemConvTree: Semantic Convolutional Quadtrees for Multi-Scale Event Detection in Smart City //Smart Cities. – 2024. – Т. 7. – №. 5. – С. 2763-2780.
+- Kalyuzhnaya A. et al. LLM Agents for Smart City Management: Enhancing Decision Support through Multi-Agent AI Systems - 2024 - Under Review
+
+
 
 .. |ITMO| image:: https://raw.githubusercontent.com/aimclub/open-source-ops/43bb283758b43d75ec1df0a6bb4ae3eb20066323/badges/ITMO_badge.svg
    :alt: Acknowledgement to ITMO
@@ -113,9 +127,3 @@ Contacts
 
 .. |rus| image:: https://img.shields.io/badge/lang-ru-yellow.svg
    :target: /README.rst
-
-Papers about ProtoLLM-based solutions:
-========
-- Zakharov K. et al. Forecasting Population Migration in Small Settlements Using Generative Models under Conditions of Data Scarcity //Smart Cities. – 2024. – Т. 7. – №. 5. – С. 2495-2513.
-- Kovalchuk M. A. et al. SemConvTree: Semantic Convolutional Quadtrees for Multi-Scale Event Detection in Smart City //Smart Cities. – 2024. – Т. 7. – №. 5. – С. 2763-2780.
-- Kalyuzhnaya A. et al. LLM Agents for Smart City Management: Enhancing Decision Support through Multi-Agent AI Systems - 2024 - Under Review
