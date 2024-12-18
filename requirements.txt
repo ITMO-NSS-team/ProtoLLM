@@ -1,5 +1,6 @@
 # LangChain
-langchain>=0.2.12
+
+langchain>=0.3.0
 langchain-elasticsearch~=0.3.0
 sortedcontainers~=2.4.0
 langchain-experimental~=0.3.2
@@ -12,7 +13,8 @@ tornado>=6.4.1
 pydantic>=2.9.2
 langchain-community>=0.3.3
 langchain-elasticsearch>=0.3.0
-
+langchain-core==0.3.21 ; python_version >= "3.10" and python_version < "4.0"
+langchain-text-splitters==0.3.2 ; python_version >= "3.10" and python_version < "4.0"
 
 # Docs processing
 pypdf >= 4.1.0
@@ -77,9 +79,6 @@ jiter==0.8.0 ; python_version >= "3.10" and python_version < "4.0"
 jsonpatch==1.33 ; python_version >= "3.10" and python_version < "4.0"
 jsonpointer==3.0.0 ; python_version >= "3.10" and python_version < "4.0"
 kombu==5.4.2 ; python_version >= "3.10" and python_version < "4.0"
-langchain-core==0.3.21 ; python_version >= "3.10" and python_version < "4.0"
-langchain-text-splitters==0.3.2 ; python_version >= "3.10" and python_version < "4.0"
-langchain==0.3.9 ; python_version >= "3.10" and python_version < "4.0"
 langsmith==0.1.147 ; python_version >= "3.10" and python_version < "4.0"
 markdown-it-py==3.0.0 ; python_version >= "3.10" and python_version < "4.0"
 markupsafe==3.0.2 ; python_version >= "3.10" and python_version < "4.0"

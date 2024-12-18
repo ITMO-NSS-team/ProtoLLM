@@ -1,0 +1,14 @@
+# LangChain
+langchain>=0.2.12
+langchain-elasticsearch~=0.3.0
+sortedcontainers~=2.4.0
+langchain-experimental~=0.3.2
+sentence-transformers~=2.6.1
+pydantic-settings>=2.2.1
+chromadb==0.5.3
+langchain-chroma~=0.1.4
+requests>=2.32.3
+tornado>=6.4.1
+pydantic>=2.9.2
+langchain-community>=0.3.3
+langchain-elasticsearch>=0.3.0

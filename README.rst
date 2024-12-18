@@ -44,6 +44,29 @@ Evolutionary optimisation to increase the diversity of examples; Integration wit
 Support for native models (GigaChat, YandexGPT, vsegpt, etc.).
 Interaction with open-source models deployed locally.
 
+=======
+Installation
+============
+
+- Package installer for Python **pip**
+
+The simplest way to install ProtoLLM is using ``pip``:
+
+.. code-block::
+
+  $ pip install protollm
+
+Modules with tools can be installed separately:
+
+.. code-block::
+
+  $ pip install protollm-worker
+
+  $ pip install protollm-api
+
+  $ pip install protollm-sdk
+
+
 Project Structure
 =================
 
@@ -80,7 +103,7 @@ Contacts
 ========
 - `AI Institute, ITMO <https://aim.club/>`_
 - `Anna Kalyuzhnaya <https://scholar.google.com/citations?user=bjiILqcAAAAJ&hl=ru>`_ (anna.kalyuzhnaya@itmo.ru)
-- `tg <https://t.me/protollm_helpdesk>`_
+- `Helpdesk chat <https://t.me/protollm_helpdesk>`_
 
 Papers about ProtoLLM-based solutions:
 ========
