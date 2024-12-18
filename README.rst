@@ -1,7 +1,17 @@
-.. class:: center
-
+.. start-badges
+.. list-table::
+   :stub-columns: 1
+   * - license
+     - | |license|
+   * - support
+     - | |tg|
+   * - languages
+     - | |eng| |rus|
+   * - mirror
+     - | |gitlab|
+   * - funding
     |sai| |itmo|
-
+.. end-badges
 
 Intro
 #####
@@ -66,7 +76,8 @@ Supported by
 ============
 
 The study is supported by the Research `Center Strong Artificial Intelligence in Industry <https://sai.itmo.ru/>`_
-of `ITMO University <https://itmo.ru/>`_ as part of the plan of the center's program.
+of `ITMO University <https://itmo.ru/>`_ as part of the plan of the center's program
+"Framework for rapid application prototyping based on large language models".
 
 
 Contacts
@@ -84,3 +95,27 @@ Contacts
 .. |SAI| image:: https://raw.githubusercontent.com/aimclub/open-source-ops/43bb283758b43d75ec1df0a6bb4ae3eb20066323/badges/SAI_badge.svg
    :alt: Acknowledgement to SAI
    :target: https://sai.itmo.ru/
+
+.. |license| image:: https://img.shields.io/github/license/aimclub/ProtoLLM
+   :alt: Licence for repo
+   :target: https://github.com/aimclub/ProtoLLM/blob/master/LICENSE.md
+
+.. |tg| image:: https://img.shields.io/badge/Telegram-Group-blue.svg
+   :target: https://t.me/protollm_helpdesk
+   :alt: Telegram Chat
+
+.. |gitlab| image:: https://img.shields.io/badge/mirror-GitLab-orange
+   :alt: GitLab mirror for this repository
+   :target: https://gitlab.actcognitive.org/itmo-sai-code/ProtoLLM
+
+.. |eng| image:: https://img.shields.io/badge/lang-en-red.svg
+   :target: /README_en.rst
+
+.. |rus| image:: https://img.shields.io/badge/lang-ru-yellow.svg
+   :target: /README.rst
+
+Papers about ProtoLLM-based solutions:
+========
+- Zakharov K. et al. Forecasting Population Migration in Small Settlements Using Generative Models under Conditions of Data Scarcity //Smart Cities. – 2024. – Т. 7. – №. 5. – С. 2495-2513.
+- Kovalchuk M. A. et al. SemConvTree: Semantic Convolutional Quadtrees for Multi-Scale Event Detection in Smart City //Smart Cities. – 2024. – Т. 7. – №. 5. – С. 2763-2780.
+- Kalyuzhnaya A. et al. LLM Agents for Smart City Management: Enhancing Decision Support through Multi-Agent AI Systems - 2024 - Under Review
