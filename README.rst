@@ -22,35 +22,27 @@ Intro
 **Proto-LLM** is an open-source framework for fast protyping of LLM-based applications.
 
 
-Proto LLM features (WIP)
+Proto LLM features
 =======================
-- Rapid prototyping of information retrieval systems based on BNM using RAG:
+- Rapid prototyping of information retrieval systems based on LLM using RAG:
 Implementations of architectural patterns for interacting with different databases and web service interfaces;
 Methods for optimising RAG pipelines to eliminate redundancy.
 
-- Development and integration of applications with BNM with connection of external services and models through plugin system:
+- Development and integration of applications with LLM with connection of external services and models through plugin system:
 Integration with AutoML solutions for predictive tasks;
 Providing structured output generation and validation;
 
-- Implementation of ensemble methods and multi-agent approaches to improve the efficiency of BNMs:
-Possibility of combining arbitrary BNMs into ensembles to improve generation quality, automatic selection of ensemble composition;
+- Implementation of ensemble methods and multi-agent approaches to improve the efficiency of LLMs:
+Possibility of combining arbitrary LLMs into ensembles to improve generation quality, automatic selection of ensemble composition;
 Work with model-agents and ensemble pipelines;
 
-- Generation of complex synthetic data for further training and improvement of BNM:
+- Generation of complex synthetic data for further training and improvement of LLM:
 Generating examples from existing models and data sets;
 Evolutionary optimisation to increase the diversity of examples; Integration with Label Studio;
 
 - Providing interoperability with various LLM providers:
-Support for native models (GigaChat, YandexGPT, vsegpt, etc.). 
+Support for native models (GigaChat, YandexGPT, vsegpt, etc.).
 Interaction with open-source models deployed locally.
-
-
-Analogs
-=======
-
-LLMware, LLMStach, LangChain
-
-However, they are not direct competitors to the framework being created, as it is a higher-level tool that uses existing LLMOps solutions where possible and necessary, and provides compatibility with them for most tasks.
 
 Project Structure
 =================
@@ -59,10 +51,11 @@ The latest stable release of ProtoLLM is in the `master branch <https://github.c
 
 The repository includes the following directories:
 
-* Package `core <https://github.com/ITMO-NSS-team/ProtoLLM/tree/master/protollm>`__  contains the main modules. It is the *core* of the ProtoLLM framework
-* Package `examples <https://github.com/ITMO-NSS-team/ProtoLLM/tree/master/examples>`__ includes several *how-to-use-cases* where you can start to discover how ProtoLLM works
-* All *unit and integration tests* can be observed in the `test <https://github.com/ITMO-NSS-team/ProtoLLM/tree/master/test>`__ directory
-* The sources of the documentation are in the `docs <https://github.com/ITMO-NSS-team/ProtoLLM/tree/master/docs>`__ directory
+* Package `protollm <https://github.com/ITMO-NSS-team/ProtoLLM/tree/master/protollm>`__  contains the main modules. It is the *core* of the ProtoLLM framework;
+* Package `protollm_tools <https://github.com/ITMO-NSS-team/ProtoLLM/tree/master/protollm_tools>`__  contains side tools with specific dependensied;
+* Package `examples <https://github.com/ITMO-NSS-team/ProtoLLM/tree/master/examples>`__ includes several *how-to-use-cases* where you can start to discover how ProtoLLM works;
+* All *unit and integration tests* can be observed in the `test <https://github.com/ITMO-NSS-team/ProtoLLM/tree/master/test>`__ directory;
+* The sources of the documentation are in the `docs <https://github.com/ITMO-NSS-team/ProtoLLM/tree/master/docs>`__ directory.
 
 Contribution Guide
 ==================
