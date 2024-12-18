@@ -1,10 +1,9 @@
 import logging
-import warnings
 
 from langchain_core.documents import Document
 from langchain_core.language_models import LLM
 
-from protollm.rags.rag_core.prompt_templates import PROMPT_RANK, PROMPT_LLM_RESPONSE
+from protollm.templates.prompt_templates.rag_prompt_templates import PROMPT_RANK, PROMPT_LLM_RESPONSE
 from protollm.rags.rag_core.reranker import LLMReranker
 from protollm.rags.rag_core.retriever import DocRetriever, DocsSearcherModels, RetrievingPipeline
 
