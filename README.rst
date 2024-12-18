@@ -1,17 +1,17 @@
-.. start-badges
-.. list-table::
-   :stub-columns: 1
-   * - license
-     - | |license|
-   * - support
-     - | |tg|
-   * - languages
-     - | |eng| |rus|
-   * - mirror
-     - | |gitlab|
-   * - funding
-    |sai| |itmo|
-.. end-badges
+    .. start-badges
+        .. list-table::
+           :stub-columns: 1
+               * - license
+                 - | |license|
+               * - support
+                 - | |tg|
+               * - languages
+                 - | |eng| |rus|
+               * - mirror
+                 - | |gitlab|
+               * - funding
+                 - |sai| |itmo|
+    .. end-badges
 
 Intro
 #####
