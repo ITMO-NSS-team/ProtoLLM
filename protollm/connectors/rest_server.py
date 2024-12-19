@@ -37,23 +37,23 @@ class ChatRESTServer(BaseChatModel):
                 raise ValueError("Received unsupported message type.")
 
 
-            content = ""
-            if isinstance(message.content, str):
-                content = message.content
-            else:
-                raise ValueError(
-                    "Unsupported message content type. "
-                    "Must have type 'text' "
-                )
-            chat_messages.append(
-                {
-                    "role": role,
-                    "content": content
-                }
+        content = ""
+        if isinstance(message.content, str):
+            content = message.content
+        else:
+            raise ValueError(
+                "Unsupported message content type. "
+                "Must have type 'text' "
             )
+        chat_messages.append(
+            {
+                "role": role,
+                "content": content
+            }
+        )
         return chat_messages
 
-    def _create_chat(
+    def create_chat(
             self,
             messages: List[BaseMessage],
             stop: Optional[List[str]] = None,
@@ -64,6 +64,10 @@ class ChatRESTServer(BaseChatModel):
             "messages": self._convert_messages_to_rest_server_messages(
                 messages)
         }
+
+        if self.base_url=='mock':
+            return {'test':'test'}
+
         response = requests.post(
             url=f'{self.base_url}/v1/chat/completions',
             headers={"Content-Type": "application/json"},
@@ -73,7 +77,7 @@ class ChatRESTServer(BaseChatModel):
         response.encoding = "utf-8"
         match response.status_code:
             case 200:
-                continue  # Status code is 200, no action needed
+                pass  # Status code is 200, no action needed
             case 404:
                 raise ValueError(
                     "CustomWeb call failed with status code 404. "

@@ -23,7 +23,7 @@ Intro
 
 
 Proto LLM features
-=======================
+==================
 - Rapid prototyping of information retrieval systems based on LLM using RAG:
 Implementations of architectural patterns for interacting with different databases and web service interfaces;
 Methods for optimising RAG pipelines to eliminate redundancy.
@@ -44,7 +44,7 @@ Evolutionary optimisation to increase the diversity of examples; Integration wit
 Support for native models (GigaChat, YandexGPT, vsegpt, etc.).
 Interaction with open-source models deployed locally.
 
-=======
+
 Installation
 ============
 
