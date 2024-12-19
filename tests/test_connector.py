@@ -1,4 +1,4 @@
-from langchain_core.messages import BaseMessage, HumanMessage
+from langchain_core.messages import HumanMessage
 
 from protollm.connectors.rest_server import ChatRESTServer
 
