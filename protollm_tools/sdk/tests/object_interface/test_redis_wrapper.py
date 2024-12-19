@@ -4,7 +4,7 @@ import time
 
 import pytest
 
-from protollm_sdk.object_interface.redis_wrapper import RedisWrapper
+from protollm_sdk.object_interface import RedisWrapper
 
 
 @pytest.fixture

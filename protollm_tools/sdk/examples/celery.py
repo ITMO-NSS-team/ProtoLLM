@@ -1,10 +1,10 @@
 import uuid
 
-from sdk.protollm_sdk.config import Config
-from sdk.protollm_sdk.celery.app import task_test
-from sdk.protollm_sdk.celery.job import TextEmbedderJob, ResultStorageJob, LLMAPIJob, \
+from protollm_sdk.config import Config
+from protollm_sdk.celery.app import task_test
+from protollm_sdk.celery.job import TextEmbedderJob, ResultStorageJob, LLMAPIJob, \
     VectorDBJob, OuterLLMAPIJob
-from sdk.protollm_sdk.object_interface.redis_wrapper import RedisWrapper
+from protollm_sdk.object_interface.redis_wrapper import RedisWrapper
 
 
 def embed():
