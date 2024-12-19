@@ -6,7 +6,7 @@ from protollm_sdk.jobs.job_context import JobContext
 
 class Job(ABC):
     """
-    Job interface for integration with outer modules to STAIRS.
+    Job interface for integration with outer modules.
     All the required data for job should be passed and parameters should be defined in advance,
     this also applies to the run method
     """
