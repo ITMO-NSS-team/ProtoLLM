@@ -1,0 +1,38 @@
+networks:
+  net:
+    driver: bridge
+
+services:
+  server:
+    image: chromadb/chroma:latest
+    environment:
+      - IS_PERSISTENT=TRUE
+    volumes:
+      # Default configuration for persist_directory in chromadb/config.py
+      # Currently it's located in "/chroma/chroma/"
+      - chroma_data:/chroma/chroma/
+    ports:
+      - 9941:8000
+    networks:
+      - net
+
+  embedding_server:
+    image: ${EMBEDDING_IMAGE:-ghcr.io/huggingface/text-embeddings-inference:cpu-0.3.0} #default image with CPU support
+    # using ${EMBEDDING_IMAGE:-ghcr.io/huggingface/text-embeddings-inference:cuda-1.6} for gpu
+    command: --model-id ${ST_MODEL:-intfloat/multilingual-e5-large} --revision ${ST_MODEL_REVISION:-main} # configure model and model revision paramters.
+    # you can choose a embedding model by changing the varaibale ST_MODEL:-intfloat/multilingual-e5-large
+    # where intfloat/multilingual-e5-large path to huggingface model
+    ports:
+      - 9942:80
+    networks:
+      - net
+    volumes:
+      - embedding_data:/data #by default we create a volume for the models.
+
+volumes:
+  chroma_data:
+    driver: local
+    # device: # enter path to external folder
+  embedding_data:
+    driver: local
+    # device: # enter path to external folder
