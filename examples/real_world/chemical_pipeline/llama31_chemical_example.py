@@ -17,7 +17,7 @@ from langchain.prompts import ChatPromptTemplate, MessagesPlaceholder
 from langchain_core.prompts import SystemMessagePromptTemplate, HumanMessagePromptTemplate
 import pandas as pd
 from protollm.agents.llama31_agents.llama31_agent import Llama31ChatModel
-from examples.chemical_pipeline.validate_tools import validate_decompose, compute_metrics, validate_conductor
+from examples.real_world.chemical_pipeline.validate_tools import validate_decompose, compute_metrics, validate_conductor
 
 
 def make_markdown_table(props: dict) -> str:

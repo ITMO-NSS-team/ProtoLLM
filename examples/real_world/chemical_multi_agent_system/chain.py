@@ -18,9 +18,9 @@ from langchain.prompts import ChatPromptTemplate, MessagesPlaceholder
 from langchain_core.prompts import SystemMessagePromptTemplate, HumanMessagePromptTemplate
 import pandas as pd
 from protollm.agents.llama31_agents.llama31_agent import Llama31ChatModel
-from examples.chemical_multi_agent_system.tools import gen_mols_parkinson, gen_mols_lung_cancer, gen_mols_acquired_drug_resistance, \
+from examples.real_world.chemical_multi_agent_system.tools import gen_mols_parkinson, gen_mols_lung_cancer, gen_mols_acquired_drug_resistance, \
          gen_mols_dyslipidemia, gen_mols_multiple_sclerosis, gen_mols_alzheimer, request_mols_generation
-from examples.chemical_multi_agent_system.prompting import system_prompt_conductor, system_prompt_decomposer, human_prompt
+from examples.real_world.chemical_multi_agent_system.prompting import system_prompt_conductor, system_prompt_decomposer, human_prompt
 
 
 tools = [gen_mols_parkinson, gen_mols_lung_cancer, gen_mols_acquired_drug_resistance,
