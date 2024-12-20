@@ -164,7 +164,7 @@ def compute_metrics(model_name: str = 'no_name_model', file_path: str = 'experim
             continue
 
     pd.DataFrame(lst, columns=columns).to_excel(
-        f"multi_agents_system/testcase/result_v1_{model_name}.xlsx", index=False
+        f"result.xlsx", index=False
     )
 
     if not(just_1_case_in_all_smpls):
