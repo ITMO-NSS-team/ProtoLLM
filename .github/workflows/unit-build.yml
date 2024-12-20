@@ -36,7 +36,7 @@ jobs:
     - name: Install extra dependencies
       run: |
         pip install pytest-asyncio
-        pip install ./protollm_tools/llm-api/requirements.txt
+        pip install -r ./protollm_tools/llm-api/requirements.txt
     - name: Extra test with pytest
       run: |
         pytest -s ./protollm_tools/llm-api/tests/unit
