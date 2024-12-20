@@ -106,7 +106,7 @@ Contacts
 - `Helpdesk chat <https://t.me/protollm_helpdesk>`_
 
 Papers about ProtoLLM-based solutions:
-========
+=====================================
 - Zakharov K. et al. Forecasting Population Migration in Small Settlements Using Generative Models under Conditions of Data Scarcity //Smart Cities. – 2024. – Т. 7. – №. 5. – С. 2495-2513.
 - Kovalchuk M. A. et al. SemConvTree: Semantic Convolutional Quadtrees for Multi-Scale Event Detection in Smart City //Smart Cities. – 2024. – Т. 7. – №. 5. – С. 2763-2780.
 - Kalyuzhnaya A. et al. LLM Agents for Smart City Management: Enhancing Decision Support through Multi-Agent AI Systems - 2024 - Under Review
