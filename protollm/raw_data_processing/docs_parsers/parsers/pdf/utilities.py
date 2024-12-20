@@ -14,13 +14,13 @@ from pdfminer.high_level import extract_pages
 from pdfminer.layout import LTTextContainer, LTChar, LTFigure, LTTextLine, LAParams
 from tabulate import tabulate
 
-from raw_data_processing.docs_parsers.utils.exceptions import (
+from protollm.raw_data_processing.docs_parsers.utils.exceptions import (
     NoTextLayerError,
     ParseImageWarning,
     TitleExtractingWarning,
     PageNumbersExtractingWarning,
 )
-from raw_data_processing.docs_parsers.parsers.utilities import (
+from protollm.raw_data_processing.docs_parsers.parsers.utilities import (
     HEADING_KEYWORDS,
     HEADING_STOP_LIST,
     FOOTER_KEYWORDS,

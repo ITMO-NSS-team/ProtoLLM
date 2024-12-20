@@ -6,7 +6,7 @@ from typing import Iterator, List, Union
 from langchain_core.document_loaders import Blob
 from langchain_core.documents import Document
 
-from raw_data_processing.docs_parsers.parsers.entities import DocType
+from protollm.raw_data_processing.docs_parsers.parsers.entities import DocType
 
 
 class BaseParser(ABC):

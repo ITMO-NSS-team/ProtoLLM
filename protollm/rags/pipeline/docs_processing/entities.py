@@ -6,15 +6,15 @@ from langchain_core.document_loaders import BaseLoader
 from langchain_core.documents import Document
 from langchain_core.load import load as ln_load
 
-from protollm.docs_processing.splitting import ListHierarchySplitter, HierarchicalMerger, RecursiveSplitter
-from protollm.docs_processing.splitting.metadata_sentence_splitter import DivMetadataSentencesSplitter
-from protollm.docs_processing.splitting.key_words_splitter import MultiMetadataAppender
+from protollm.raw_data_processing.docs_transformers import ChunkMerger, RecursiveSplitter
+from protollm.raw_data_processing.docs_transformers.metadata_sentence_splitter import DivMetadataSentencesSplitter
+from protollm.raw_data_processing.docs_transformers.key_words_splitter import MultiMetadataAppender
 
 
 transformer_object_dict = {
     'recursive_character': RecursiveSplitter,
-    'list_hierarchy': ListHierarchySplitter,
-    'hierarchical_merger': HierarchicalMerger,
+    # 'list_hierarchy': ListHierarchySplitter,
+    'hierarchical_merger': ChunkMerger,
     'div_sentence_splitter': DivMetadataSentencesSplitter,
     'keyword_appender': MultiMetadataAppender
 }

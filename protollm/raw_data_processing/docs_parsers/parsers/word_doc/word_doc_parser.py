@@ -5,15 +5,15 @@ from typing import Iterator, Union, Optional
 from langchain_core.document_loaders import Blob
 from langchain_core.documents import Document
 
-from raw_data_processing.docs_parsers.utils.exceptions import EncodingError
-from raw_data_processing.docs_parsers.parsers.base import BaseParser
-from raw_data_processing.docs_parsers.parsers.entities import ParsingScheme
-from raw_data_processing.docs_parsers.parsers.word_doc.utilities import (
+from protollm.raw_data_processing.docs_parsers.utils.exceptions import EncodingError
+from protollm.raw_data_processing.docs_parsers.parsers.base import BaseParser
+from protollm.raw_data_processing.docs_parsers.parsers.entities import ParsingScheme
+from protollm.raw_data_processing.docs_parsers.parsers.word_doc.utilities import (
     get_paragraphs,
     get_chapters,
     add_headings_hierarchy,
 )
-from raw_data_processing.docs_parsers.utils.utilities import correct_path_encoding, is_bad_encoding
+from protollm.raw_data_processing.docs_parsers.utils.utilities import correct_path_encoding, is_bad_encoding
 
 
 class WordDocumentParser(BaseParser):
@@ -30,7 +30,7 @@ class WordDocumentParser(BaseParser):
         timeout_for_converting: Optional[int] = None,
     ):
         try:
-            import raw_data_processing.docs_parsers.parsers.word_doc.docx_parsing
+            import protollm.raw_data_processing.docs_parsers.parsers.word_doc.docx_parsing
         except Exception as e:
             raise e
         # except ImportError as error:
@@ -46,7 +46,7 @@ class WordDocumentParser(BaseParser):
         self.timeout = timeout_for_converting
 
     def lazy_parse(self, blob: Blob) -> Iterator[Document]:
-        from raw_data_processing.docs_parsers.parsers.word_doc.docx_parsing import (
+        from protollm.raw_data_processing.docs_parsers.parsers.word_doc.docx_parsing import (
             parse_docx_to_lines,
         )
 
@@ -59,7 +59,7 @@ class WordDocumentParser(BaseParser):
 
         match blob.mimetype:
             case "doc" | "odt" | "rtf":
-                from raw_data_processing.docs_parsers.parsers.converting import (
+                from protollm.raw_data_processing.docs_parsers.parsers.converting import (
                     converted_file_to_docx,
                 )
 

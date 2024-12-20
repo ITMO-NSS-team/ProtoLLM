@@ -3,7 +3,7 @@ import subprocess
 from pathlib import Path
 from typing import Union
 
-from raw_data_processing.docs_parsers.utils.exceptions import ConvertingError
+from protollm.raw_data_processing.docs_parsers.utils.exceptions import ConvertingError
 
 
 def _convert_with_soffice(

@@ -5,7 +5,7 @@ from PIL import Image
 from docx.text.paragraph import Paragraph
 from lxml import etree
 
-from raw_data_processing.docs_parsers.parsers.word_doc.xml.xml_tag import XMLTag
+from protollm.raw_data_processing.docs_parsers.parsers.word_doc.xml.xml_tag import XMLTag
 
 
 def _convert_to_latex(

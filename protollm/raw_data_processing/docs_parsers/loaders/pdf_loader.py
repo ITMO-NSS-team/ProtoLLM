@@ -4,8 +4,8 @@ from typing import Iterator, Union, Any, Optional
 from langchain_core.document_loaders import BaseLoader, Blob
 from langchain_core.documents import Document
 
-from raw_data_processing.docs_parsers.parsers import PDFParser, ParsingScheme, DocType
-from raw_data_processing.docs_parsers.utils.logger import ParsingLogger
+from protollm.raw_data_processing.docs_parsers.parsers import PDFParser, ParsingScheme, DocType
+from protollm.raw_data_processing.docs_parsers.utils.logger import ParsingLogger
 
 
 class PDFLoader(BaseLoader):

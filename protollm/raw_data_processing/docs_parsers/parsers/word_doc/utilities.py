@@ -1,6 +1,6 @@
 import re
 
-from raw_data_processing.docs_parsers.parsers.utilities import (
+from protollm.raw_data_processing.docs_parsers.parsers.utilities import (
     HEADING_KEYWORDS,
     HEADING_STOP_LIST,
 )

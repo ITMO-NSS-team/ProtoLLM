@@ -11,11 +11,11 @@ from docx.text.paragraph import Paragraph
 from ftfy import fix_text
 from tabulate import tabulate
 
-from raw_data_processing.docs_parsers.parsers.utilities import is_bulleted_text
-from raw_data_processing.docs_parsers.parsers.word_doc.docx_parsing_config import (
+from protollm.raw_data_processing.docs_parsers.parsers.utilities import is_bulleted_text
+from protollm.raw_data_processing.docs_parsers.parsers.word_doc.docx_parsing_config import (
     DocxParsingConfig,
 )
-from raw_data_processing.docs_parsers.parsers.word_doc.xml import process_paragraph_body
+from protollm.raw_data_processing.docs_parsers.parsers.word_doc.xml import process_paragraph_body
 
 
 def _get_list_level(split_text: list[str], level: int = -1) -> int:

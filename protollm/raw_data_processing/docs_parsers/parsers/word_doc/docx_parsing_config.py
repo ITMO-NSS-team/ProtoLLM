@@ -1,6 +1,6 @@
 from docx.document import Document
 
-from raw_data_processing.docs_parsers.parsers.word_doc.xml.utilities import (
+from protollm.raw_data_processing.docs_parsers.parsers.word_doc.xml.utilities import (
     _get_omml2mml_transformation,
     _get_mml2tex_transformation,
 )

@@ -6,14 +6,14 @@ from typing import Iterator, Union
 from langchain_core.document_loaders import Blob
 from langchain_core.documents import Document
 
-from raw_data_processing.docs_parsers.utils.exceptions import (
+from protollm.raw_data_processing.docs_parsers.utils.exceptions import (
     EncodingError,
     ChaptersExtractingFailedWarning,
 )
-from raw_data_processing.docs_parsers.parsers.base import BaseParser
-from raw_data_processing.docs_parsers.parsers.entities import ParsingScheme
-from raw_data_processing.docs_parsers.parsers.utilities import CONTENTS_KEYWORDS
-from raw_data_processing.docs_parsers.utils.utilities import correct_path_encoding, is_bad_encoding
+from protollm.raw_data_processing.docs_parsers.parsers.base import BaseParser
+from protollm.raw_data_processing.docs_parsers.parsers.entities import ParsingScheme
+from protollm.raw_data_processing.docs_parsers.parsers.utilities import CONTENTS_KEYWORDS
+from protollm.raw_data_processing.docs_parsers.utils.utilities import correct_path_encoding, is_bad_encoding
 
 
 class PDFParser(BaseParser):
@@ -30,7 +30,7 @@ class PDFParser(BaseParser):
         remove_service_info: bool = False,
     ):
         try:
-            import raw_data_processing.docs_parsers.parsers.pdf.utilities
+            import protollm.raw_data_processing.docs_parsers.parsers.pdf.utilities
         except ImportError as error:
             raise ImportError(
                 f"{error.name} package not found, please try to install it with `pip install {error.name}`"
@@ -44,7 +44,7 @@ class PDFParser(BaseParser):
         self.remove_service_info = remove_service_info
 
     def lazy_parse(self, blob: Blob) -> Iterator[Document]:
-        from raw_data_processing.docs_parsers.parsers.pdf.utilities import extract_by_lines
+        from protollm.raw_data_processing.docs_parsers.parsers.pdf.utilities import extract_by_lines
 
         source = blob.source
         source = correct_path_encoding(source) if source is not None else ""
