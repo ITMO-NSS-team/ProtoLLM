@@ -4,7 +4,6 @@ from langchain.agents import (
     tool,
 )
 from langchain.prompts import ChatPromptTemplate, MessagesPlaceholder
-from langchain.tools.render import render_text_description_and_args
 from langchain_core.prompts import SystemMessagePromptTemplate, HumanMessagePromptTemplate
 
 from protollm.agents.llama31_agents.llama31_agent import Llama31ChatModel
@@ -75,9 +74,9 @@ prompt = ChatPromptTemplate.from_messages(
 
 # Initialize the custom LLM
 llm = Llama31ChatModel(
-    api_key="API_KEY",
-    base_url="BASE_URL",
-    model="MODEL",
+    api_key="",
+    base_url="",
+    model="meta-llama/llama-3.1-70b-instruct",
     temperature=0.5,
     max_tokens=3000,
 )
