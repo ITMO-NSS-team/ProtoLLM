@@ -4,7 +4,7 @@ Example of using an agent in a chemical pipeline with tools for drug generation 
 Process:
 - Reading from a file with example queries. 
 - Pipeline starts. 
-- Results are written to the same file, metrics are calculated (without human evaluation).
+- Results are written to the same file.
 """
 from langchain.agents import (
     create_structured_chat_agent,
@@ -271,7 +271,7 @@ prompt = ChatPromptTemplate.from_messages(
 
 # Initialize the custom LLM
 llm = Llama31ChatModel(
-    api_key='API_KEY_HERE',
+    api_key='API_KEY_VSE_GPT',
     base_url="https://api.vsegpt.ru/v1",
     model="meta-llama/llama-3.1-70b-instruct",
     temperature=0.5,
@@ -298,31 +298,22 @@ agent_executor = AgentExecutor.from_agent_and_tools(
 
 # Example usage of the agent
 if __name__ == "__main__":
-    path = 'examples/queries_responses_chemical.xlsx'
+    path = 'examples/chemical_pipeline/queries_responses_chemical.xlsx'
     questions = pd.read_excel(path).values.tolist()
-    total_succ = 0
     
     for i, q in enumerate(questions):
         print('Task № ', i)
         response = agent_executor.invoke({
             "input": q[1]
         })
-        succ = 0
         
         validate_decompose(i, response["intermediate_steps"], path)
         for n, tools_pred in enumerate(response["intermediate_steps"]):
             name_tool = tools_pred[0].tool
             func = {'name': name_tool}
-            if validate_conductor(i, func, n, path):
-                succ += 1
-                
-        if succ == n + 1:
-            total_succ += 1 
-        print(f'VALIDATION: Success {total_succ} from {i + 1}')
+            validate_conductor(i, func, n, path)
             
         # Access the output
         final_answer = response["output"]
         # Print the final answer
         print(f"Agent's Response: \n {final_answer}")
-    
-    compute_metrics(file_path=path)
