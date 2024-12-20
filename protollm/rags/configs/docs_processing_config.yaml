@@ -1,0 +1,32 @@
+loader:
+  loader_name: 'PDFLoader'
+  parsing_params:
+    parsing_scheme: 'paragraphs'
+    extract_images: False
+    extract_tables: False
+    parse_formulas: False
+    remove_service_info: True
+    handle_converting_error: False
+
+
+splitter:
+  splitter_name: 'hierarchical_merger'
+  splitter_params:
+    chunk_size: 510
+    chunk_overlap: 0
+    separators:
+      - '\n\n'
+      - '\n'
+      - '. '
+      - ', '
+      - '.'
+      - ','
+      - ' '
+      - ''
+    keep_separator: False
+    add_start_index: False
+    strip_whitespace: True
+    apply_chunks_merge: True
+
+#tokenizer: 'hf-internal-testing/llama-tokenizer'
+tokenizer: 'any'
