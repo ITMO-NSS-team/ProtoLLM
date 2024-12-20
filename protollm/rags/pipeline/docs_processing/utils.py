@@ -2,7 +2,8 @@ import os
 from pathlib import Path
 from typing import Any
 
-from protollm.docs_processing.parsing import PDFLoader, WordDocumentLoader, ZipLoader, RecursiveDirectoryLoader
+from protollm.raw_data_processing.docs_parsers.loaders import PDFLoader, WordDocumentLoader, ZipLoader, \
+    RecursiveDirectoryLoader
 from langchain_core.document_loaders import BaseLoader
 
 from protollm.rags.pipeline.docs_processing.entities import LoaderType, LangChainDocumentLoader

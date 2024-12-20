@@ -16,7 +16,7 @@ from protollm.rags.rag_core.retriever import DocsSearcherModels, DocRetriever, R
 from protollm.rags.rag_core.utils import run_multiple_rag
 from protollm.rags.settings.chroma_settings import settings
 
-from protollm.docs_processing.splitting.key_words_splitter import KeywordExtractor
+from protollm.raw_data_processing.docs_transformers.key_words_splitter import KeywordExtractor
 
 logger = logging.getLogger(__name__)
 logger.addHandler(logging.StreamHandler())
