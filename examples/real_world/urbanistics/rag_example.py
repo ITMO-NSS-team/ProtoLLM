@@ -12,10 +12,11 @@ from definitions import CONFIG_PATH
 
 
 def init_chroma_client():
+    host, port = os.environ.get("CHROMA_DEFAULT_SETTINGS").split(':')
     return chromadb.HttpClient(
-        host=default_settings.chroma_host,
-        port=default_settings.chroma_port,
-        settings=chromadb.Settings(allow_reset=default_settings.allow_reset),
+        host=host,
+        port=int(port),
+        settings=chromadb.Settings(),
     )
 
 
@@ -26,7 +27,8 @@ def proto_view(
     embedding_function: HuggingFaceHubEmbeddings = None,
 ) -> list:
     # Returns k chunks that are closest to the query
-    embedding_function = HuggingFaceHubEmbeddings(model=default_settings.embedding_host)
+    embedding_host = os.environ.get("EMBEDDING_HOST")
+    embedding_function = HuggingFaceHubEmbeddings(model=embedding_host)
     chroma_client = init_chroma_client()
 
     docs_searcher_models = DocsSearcherModels(embedding_model=embedding_function, chroma_client=chroma_client)
@@ -66,7 +68,7 @@ if __name__ == "__main__":
 
     # Извлечение контекста из БД
     context = proto_view(question, collection_name)
-    context = f'Вопрос: {question} Контекст: {context[0][0].page_content}'
+    context = f'Вопрос: {question} Контекст: {context[0].page_content}'
 
     # Получение ответа от БЯМ
     print(f'Ответ VseGPT LLM: \n {outer_llm(context, meta, key)}')
