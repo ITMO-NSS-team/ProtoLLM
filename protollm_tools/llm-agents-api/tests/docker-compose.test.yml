@@ -1,0 +1,19 @@
+services:
+  db:
+    image: postgres:16
+    ports:
+      - "55530:5432"
+    environment:
+      - POSTGRES_PASSWORD=test
+      - POSTGRES_DB=test
+      - POSTGRES_USER=test
+
+  cache:
+    image: redis:7.2-alpine
+    ports:
+      - "55531:6379"
+
+  vectorstore:
+    image: chromadb/chroma:0.5.11
+    ports:
+      - "57776:8000"
