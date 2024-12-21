@@ -685,16 +685,7 @@ Metrics results:
 
 if __name__ == "__main__":
     chunks = 4
-    # metrics = [answer_relevancy, faithfulness, correctness_metric]
-    metrics = [correctness_metric, answer_relevancy]
-    # metrics = []
-    # choose_pipeline_test(answer_check=True)
-    # accessibility_pipeline_test(metrics, answer_check=True)
-    # strategy_pipeline_test(metrics, chunks)
 
-    # path_1 = "pipeline_selection_with_check_mixtral-8x22b-instruct_2024-10-09 19:00:00.csv"
-    # path_2 = "accessibility_pipeline_with_check_mixtral-8x22b-instruct_2024-10-09 19:11:00.csv"
-    # path_3 = "strategy_pipeline_mixtral-8x22b-instruct_2024-10-09-13:59:00.csv"
-    # complete_pipeline_metrics(path_1, path_2, path_3, check_flag=True)
+    metrics = [correctness_metric, answer_relevancy]
 
     complete_pipeline_metrics(check_flag=False)
