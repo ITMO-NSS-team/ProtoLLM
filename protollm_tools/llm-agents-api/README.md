@@ -1,7 +1,7 @@
 # llm-agents-api
 
 This tool library provides a simple API for creating and running LLM agents and build multi-agent systems.
-SDK allows agents creation and management, and provides interface to integrate those using router agent and ansimble agent.
+SDK allows agents creation and management, and provides interface to integrate those using router agent and ensemble agent.
 Tool also provides an Entrypoint object which starts uvicorn server for running the API.
 
 ## Installation
@@ -46,7 +46,7 @@ Example query:
     "query":"Какие целевые показатели госпрограмм по образованию и защите окружающей среды?"
 }
 ```
-- `ws://<app_host>:<app_port>/ansimble` - Websocket connection to the ansimble agent
+- `ws://<app_host>:<app_port>/ensemble` - Websocket connection to the ensemble agent
 Example query:
 ```json
 {
