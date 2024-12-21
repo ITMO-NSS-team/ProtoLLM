@@ -38,13 +38,13 @@
 
 Самый простой способ установить ProtoLLM - это использовать ``pip``:
 
-... code-block::
+.. code-block::
 
   $ pip install protollm
 
 Модули с инструментами могут быть установлены отдельно:
 
-... code-block::
+.. code-block::
 
   $ pip install protollm-worker
 
