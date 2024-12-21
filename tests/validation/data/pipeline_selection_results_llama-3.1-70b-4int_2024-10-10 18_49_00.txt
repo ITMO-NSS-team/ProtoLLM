@@ -1,0 +1,4 @@
+Percentage of correctly chosen pipeline: 98.67
+Percentage of correctly chosen pipeline with checking: RUN WITHOUT CHECKING
+Average pipeline choosing time: 1.08
+Average pipeline checking time: RUN WITHOUT CHECKING

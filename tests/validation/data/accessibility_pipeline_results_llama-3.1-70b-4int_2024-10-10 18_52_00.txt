@@ -1,0 +1,9 @@
+Percentage of correctly chosen functions: 94.67
+Percentage of correctly chosen functions with checking: RUN WITHOUT CHECKING
+Average function choosing time: 1.17
+Average functions checking time: RUN WITHOUT CHECKING
+Average answer generation time: 3.25
+Average total time: 4.42
+Short metrics results:
+Average Correctness (GEval)_score is 0.5033557046979866. Number of unsuccessfully processed questions 1
+Average Answer Relevancy_score is 0.690531746031746. Number of unsuccessfully processed questions 0

@@ -1,0 +1,4 @@
+Average total time (answer generation time): 2.65
+Short metrics results:
+Average Correctness (GEval)_score is 0.3853333333333333. Number of unsuccessfully processed questions 0
+Average Answer Relevancy_score is 0.7102246272246271. Number of unsuccessfully processed questions 0
