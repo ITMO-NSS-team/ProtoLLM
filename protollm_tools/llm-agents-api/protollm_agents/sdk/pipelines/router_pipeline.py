@@ -32,10 +32,10 @@ SYS_PROMPT = """ Ты виртуальный ассистент, который 
 def _take_any(a: Optional[Any], b: Optional[Any]) -> Optional[Any]:
     return a or b
 
-class PipelineMaxInputTokensExceededException(Exception):
+class MaxInputTokensExceededException(Exception):
     pass
 
-class AgentIntermediateOutputs(BaseModel):
+class RouterOutputs(BaseModel):
     # general
     question: Annotated[str, _take_any]
     chat_history: Annotated[Optional[List[BaseMessage]], _take_any] = None
@@ -81,8 +81,8 @@ class RouterPipeline():
                      question: str,
                      chat_history: Optional[List[BaseMessage]
                                             | List[Tuple[str, str]]] = None,
-                     raise_if_error: bool = False) -> AgentIntermediateOutputs:
-        chat_history = self._convert_chat_history(chat_history)
+                     raise_if_error: bool = False) -> RouterOutputs:
+        chat_history = self._convert_history(chat_history)
         question_message = HumanMessage(content=question)
         chat_history = (chat_history or []) + [question_message]
         output = []
@@ -95,18 +95,18 @@ class RouterPipeline():
         answers = [msg for msg in output
                    if isinstance(msg, AIMessage)]
 
-        return AgentIntermediateOutputs(question=question, chat_history=chat_history[:-1], tool_results=tool_results, all_answers=answers, all_messages=output, answer=answers[-1].content)
+        return RouterOutputs(question=question, chat_history=chat_history[:-1], tool_results=tool_results, all_answers=answers, all_messages=output, answer=answers[-1].content)
 
     async def stream(self,
                      question: str,
                      chat_history: Optional[List[BaseMessage]
                                             | List[Tuple[str, str]]] = None,
-                     raise_if_error: bool = False,
-                     only_eos_answer_event: bool = False) -> AsyncGenerator[Event, None]:
+                     raise_if_error: bool = False,) -> AsyncGenerator[Event, None]:
+        self._check_num_input_tokens(question)
         current_output = ''
         tools_output = ''
-        chat_history = self._convert_chat_history(chat_history)
-        chat_history = self._cut_chat_history(
+        chat_history = self._convert_history(chat_history)
+        chat_history = self._cut_history(
             chat_history, self._max_chat_history_token_length, self._tokenizer)
         question_message = HumanMessage(content=question)
         chat_history = (chat_history or []) + [question_message]
@@ -167,7 +167,7 @@ class RouterPipeline():
             yield ErrorEvent(result=str(ex), is_eos=True)
             
     @staticmethod
-    def _convert_chat_history(chat_history: Optional[List[BaseMessage] | List[Tuple[str, str]]]) -> List[BaseMessage]:
+    def _convert_history(chat_history: Optional[List[BaseMessage] | List[Tuple[str, str]]]) -> List[BaseMessage]:
         def _convert_tuple(msg_type: str, msg: str) -> BaseMessage:
             supported_msg_types = ["system", "human", "ai"]
 
@@ -193,7 +193,7 @@ class RouterPipeline():
                              "It should be either BaseMessage or Tuple")
 
     @staticmethod
-    def _cut_chat_history(chat_history: Optional[List[BaseMessage] | List[Tuple[str, str]]],
+    def _cut_history(chat_history: Optional[List[BaseMessage] | List[Tuple[str, str]]],
                           threshold: int,
                           tokenizer: PreTrainedTokenizerFast) -> List[BaseMessage]:
         if not chat_history or len(chat_history) == 0:
@@ -211,6 +211,6 @@ class RouterPipeline():
     def _check_num_input_tokens(self, question: str):
         tokens = self._tokenizer.tokenize(question)
         if len(tokens) > self._max_input_tokens:
-            raise PipelineMaxInputTokensExceededException(
+            raise MaxInputTokensExceededException(
                 f"Input length {len(tokens)} exceeds allowed max number of tokens {self._max_input_tokens}."
             )

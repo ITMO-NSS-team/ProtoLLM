@@ -17,7 +17,7 @@ class Agent(BaseModel):
     )
     module_name: str = Field(..., description='Module name of the agent')
     class_name: str = Field(..., description='Class name of the agent')
-    agent_type: list[Literal['background', 'streaming', 'router', 'ansible']] = Field(default_factory=list, description='Type of the agent')
+    agent_type: list[Literal['background', 'streaming', 'router', 'ensemble']] = Field(default_factory=list, description='Type of the agent')
 
     @property   
     def agent_instance(self) -> BaseAgent:

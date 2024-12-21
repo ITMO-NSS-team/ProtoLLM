@@ -6,7 +6,7 @@ from langchain_openai import ChatOpenAI
 from protollm_agents.sdk.base import AgentAnswer, BaseAgent, Event
 from protollm_agents.sdk.context import Context
 from protollm_agents.sdk.pipelines.router_pipeline import RouterPipeline
-from protollm_agents.sdk.pipelines.ansimble_router_pipeline import AnsimbleRouterPipeline
+from protollm_agents.sdk.pipelines.ensemble_router_pipeline import EnsembleRouterPipeline
 
 
 class StreamingAgent(BaseAgent, ABC):
@@ -114,9 +114,9 @@ class RouterAgent(StreamingAgent):
         return None
 
 
-class AnsimbleAgent(StreamingAgent):
+class EnsembleAgent(StreamingAgent):
     """
-    An ansible agent is an agent that uses ansible to run a task.
+    An ensemble agent is an agent that uses ensemble to run a task.
     """
     class Arguments(StreamingAgent.Arguments):
         max_input_tokens: int = 6144
@@ -144,7 +144,7 @@ class AnsimbleAgent(StreamingAgent):
         assert tools is not None
         assert tokenizer is not None
 
-        pipeline = AnsimbleRouterPipeline(                 
+        pipeline = EnsembleRouterPipeline(                 
                                agent_id=self.agent_id,
                                model=model,
                                tools=tools,
@@ -172,7 +172,7 @@ class AnsimbleAgent(StreamingAgent):
         assert tools is not None
         assert tokenizer is not None
         
-        pipeline = AnsimbleRouterPipeline(                 
+        pipeline = EnsembleRouterPipeline(                 
                                agent_id=self.agent_id,
                                model=model,
                                tools=tools,

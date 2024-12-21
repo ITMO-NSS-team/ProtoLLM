@@ -51,7 +51,7 @@ class DBClient:
             return Agent.model_validate(agent_db)
 
 
-    async def get_agents(self, agent_type: Literal['background', 'streaming', 'all', 'router'] = 'all', session: AsyncSession | None = None) -> list[Agent]:
+    async def get_agents(self, agent_type: Literal['background', 'streaming', 'all', 'router', 'ensemble'] = 'all', session: AsyncSession | None = None) -> list[Agent]:
         async with self.execute(session) as sess_:
             query = select(db_models.Agent)
             if agent_type != 'all':

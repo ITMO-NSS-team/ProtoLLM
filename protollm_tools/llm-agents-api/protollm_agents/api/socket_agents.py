@@ -89,8 +89,8 @@ async def router_call(
 
 
 
-@router.websocket("/ansimble")
-async def ansible_call(
+@router.websocket("/ensemble")
+async def ensemble_call(
         websocket: WebSocket,
         connector: SocketConnector = Depends(get_socket_connector),
         manager: AgentsManager = Depends(get_agents_manager),
@@ -102,7 +102,7 @@ async def ansible_call(
         logger.info(f"{unique_query_uuid} - Connected")
         data = await websocket.receive_json()
         query_data = RouterSocketQuery.model_validate(data)
-        async for event in manager.run_ansible_agent(
+        async for event in manager.run_ensemble_agent(
             history=query_data.history_as_tuple_list, 
             query=query_data.query,
             storage=storage

@@ -6,7 +6,7 @@ def test_get_agents(docker_services, test_client):
     assert response.status_code == 200
     assert isinstance(response.json(), list)
     for agent in response.json():
-        assert agent.get("name") in ["Ansimble", "Router", "rag_environment", "rag_education", "rag_union"]
+        assert agent.get("name") in ["Ensemble", "Router", "rag_environment", "rag_education", "rag_union"]
         assert "description" in agent
         assert "arguments" in agent
         assert isinstance(agent.get("arguments"), dict)
@@ -27,8 +27,8 @@ def test_get_agent_by_id_not_found(docker_services, test_client):
     response = test_client.get(f"/{uuid.uuid4()}")
     assert response.status_code == 404
 
-def test_ansimble_websocket(docker_services, test_client, create_collections):
-    with test_client.websocket_connect("/ansimble") as websocket:
+def test_ensemble_websocket(docker_services, test_client, create_collections):
+    with test_client.websocket_connect("/ensemble") as websocket:
         json_data = {
             "dialogue_id": str(uuid.uuid4()),
             "chat_history":[],

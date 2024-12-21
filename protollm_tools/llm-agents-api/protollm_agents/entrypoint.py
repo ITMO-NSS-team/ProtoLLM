@@ -14,7 +14,7 @@ from protollm_agents.sdk.models import ChatModel, EmbeddingAPIModel, CompletionM
 from protollm_agents.sdk.base import ModelType
 from protollm_agents.services import db_client
 from protollm_agents.services import cache_client
-from protollm_agents.sdk.agents import AnsimbleAgent, BackgroundAgent, RouterAgent, StreamingAgent
+from protollm_agents.sdk.agents import EnsembleAgent, BackgroundAgent, RouterAgent, StreamingAgent
 from protollm_agents.services import agents_manager
 from protollm_agents.services import storage
 from protollm_agents.configs import EntrypointConfig
@@ -85,12 +85,12 @@ class Entrypoint:
         models = self.models
         agents = self.agents
         vector_stores = self.vector_stores
-        router_agent_id, ansible_agent_id = None, None
+        router_agent_id, ensemble_agent_id = None, None
         for agent in agents:
             if isinstance(agent, RouterAgent):
                 router_agent_id = agent.agent_id
-            if isinstance(agent, AnsimbleAgent):
-                ansible_agent_id = agent.agent_id
+            if isinstance(agent, EnsembleAgent):
+                ensemble_agent_id = agent.agent_id
         if self.config is not None:
             for model in self.config.models:
                 models.append(model.params)
@@ -106,8 +106,8 @@ class Entrypoint:
                 agents.append(agent_instance)
                 if isinstance(agent_instance, RouterAgent):
                     router_agent_id = agent_instance.agent_id
-                if isinstance(agent_instance, AnsimbleAgent):
-                    ansible_agent_id = agent_instance.agent_id
+                if isinstance(agent_instance, EnsembleAgent):
+                    ensemble_agent_id = agent_instance.agent_id
             for vector_store in self.config.vector_stores:
                 vector_stores.append(vector_store.params)
 
@@ -118,13 +118,13 @@ class Entrypoint:
                 arguments=RouterAgent.get_arguments_class().model_validate({})
             )
             agents.append(router_agent)
-        if ansible_agent_id is None:
-            ansible_agent = AnsimbleAgent(
-                name="Ansimble",
-                description="Ansimble agent",
-                arguments=AnsimbleAgent.get_arguments_class().model_validate({})
+        if ensemble_agent_id is None:
+            ensemble_agent = EnsembleAgent(
+                name="Ensemble",
+                description="Ensemble agent",
+                arguments=EnsembleAgent.get_arguments_class().model_validate({})
             )
-            agents.append(ansible_agent)
+            agents.append(ensemble_agent)
 
         for vector_store in vector_stores:
             vector_store.initialize_embeddings_model({model.name: model for model in models})

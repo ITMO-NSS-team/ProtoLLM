@@ -7,7 +7,7 @@ import logging
 from redis.asyncio import Redis
 from protollm_agents.models.responses import ErrorMessage
 from protollm_agents.models.schemas import Agent
-from protollm_agents.sdk.agents import AnsimbleAgent, BackgroundAgent, RouterAgent, StreamingAgent
+from protollm_agents.sdk.agents import EnsembleAgent, BackgroundAgent, RouterAgent, StreamingAgent
 from protollm_agents.services.db_client import DBClient
 from protollm_agents.services.exceptions import AgentNotFound, TaskNotFound
 
@@ -29,7 +29,7 @@ logger = logging.getLogger(__name__)
 
 class AgentsManager(ABC):
     router_agent_id: uuid.UUID | None = None
-    ansible_agent_id: uuid.UUID | None = None
+    ensemble_agent_id: uuid.UUID | None = None
 
     @abstractmethod
     async def initialize(self, agents: list[Any]):
@@ -59,10 +59,10 @@ class AgentsManager(ABC):
             raise ValueError("Router agent is not set")
         return self.get_streaming_agent(self.router_agent_id)
 
-    def get_ansible_agent(self) -> AnsimbleAgent:
-        if self.ansible_agent_id is None:
-            raise ValueError("Ansible agent is not set")
-        return self.get_streaming_agent(self.ansible_agent_id)
+    def get_ensemble_agent(self) -> EnsembleAgent:
+        if self.ensemble_agent_id is None:
+            raise ValueError("Ensemble agent is not set")
+        return self.get_streaming_agent(self.ensemble_agent_id)
 
     async def get_context(self, storage: Storage) -> Context:
         return Context(
@@ -151,14 +151,14 @@ class AgentsManager(ABC):
             raise e
 
 
-    async def run_ansible_agent(self, history: list[tuple], query: str, storage: Storage) -> AsyncGenerator[Event, None]:
+    async def run_ensemble_agent(self, history: list[tuple], query: str, storage: Storage) -> AsyncGenerator[Event, None]:
         try:
-            agent = await self.get_ansible_agent()
+            agent = await self.get_ensemble_agent()
             async for event in agent.stream(ctx=await self.get_context(storage), arguments=agent.arguments, history=history, query=query):
                 logger.info(f"Streaming router agent event: {event}")
                 yield self.prepare_event(agent_id=event.agent_id, event=event)
         except Exception as e:
-            yield self.prepare_event(agent_id=self.ansible_agent_id, event=ErrorEvent(agent_id=self.ansible_agent_id, result=str(e)))
+            yield self.prepare_event(agent_id=self.ensemble_agent_id, event=ErrorEvent(agent_id=self.ensemble_agent_id, result=str(e)))
             raise e
         
         
@@ -187,12 +187,12 @@ class InMemoryAgentsManager(AgentsManager):
                 if self.router_agent_id is not None:
                     raise ValueError("Main agent is already set")
                 self.router_agent_id = agent.agent_id
-            elif isinstance(agent, AnsimbleAgent):
-                if self.ansible_agent_id is not None:
-                    raise ValueError("Ansible agent is already set")
-                self.ansible_agent_id = agent.agent_id
+            elif isinstance(agent, EnsembleAgent):
+                if self.ensemble_agent_id is not None:
+                    raise ValueError("Ensemble agent is already set")
+                self.ensemble_agent_id = agent.agent_id
 
-    async def list_agents(self, agent_type: Literal['streaming', 'background', 'all'] = 'all') -> list[StreamingAgent | BackgroundAgent]:
+    async def list_agents(self, agent_type: Literal['streaming', 'background', 'ensemble', 'router', 'all'] = 'all') -> list[StreamingAgent | BackgroundAgent | EnsembleAgent | RouterAgent]:
         if agent_type == 'streaming':
             return list(self.streaming_agents.values())
         elif agent_type == 'background':
@@ -239,20 +239,20 @@ class DatabaseAgentsManager(AgentsManager):
                 if self.router_agent_id is not None:
                     raise ValueError("Main agent is already set")
                 self.router_agent_id = agent.agent_id
-            elif isinstance(agent, AnsimbleAgent):
-                agent_types.append('ansible')
-                if self.ansible_agent_id is not None:
-                    raise ValueError("Ansible agent is already set")
-                self.ansible_agent_id = agent.agent_id
+            elif isinstance(agent, EnsembleAgent):
+                agent_types.append('ensemble')
+                if self.ensemble_agent_id is not None:
+                    raise ValueError("Ensemble agent is already set")
+                self.ensemble_agent_id = agent.agent_id
             
             await self.db_client.create_agent(Agent.model_validate({**agent.to_dict(), 'agent_type': agent_types}))
 
-    async def list_agents(self, agent_type: Literal['streaming', 'background', 'router', 'ansible', 'all'] = 'all') -> list[StreamingAgent | BackgroundAgent | RouterAgent | AnsimbleAgent]:
+    async def list_agents(self, agent_type: Literal['streaming', 'background', 'router', 'ensemble', 'all'] = 'all') -> list[StreamingAgent | BackgroundAgent | RouterAgent | EnsembleAgent]:
         agents = await self.db_client.get_agents(agent_type=agent_type)
         return [agent.agent_instance for agent in agents]
        
 
-    async def get_agent(self, agent_id: uuid.UUID) -> StreamingAgent | BackgroundAgent | RouterAgent | AnsimbleAgent:
+    async def get_agent(self, agent_id: uuid.UUID) -> StreamingAgent | BackgroundAgent | RouterAgent | EnsembleAgent:
         try:
             agent = await self.db_client.get_agent(agent_id)
             return agent.agent_instance

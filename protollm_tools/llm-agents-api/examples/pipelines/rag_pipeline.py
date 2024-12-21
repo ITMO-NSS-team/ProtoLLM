@@ -1,3 +1,6 @@
+from typing import AsyncGenerator
+
+
 import ast
 import datetime
 import logging
@@ -14,12 +17,13 @@ from langchain_core.documents import Document
 from langchain_core.exceptions import OutputParserException
 from langchain_core.language_models.llms import BaseLLM
 from langchain_core.messages import BaseMessage
-from langchain_core.output_parsers.base import BaseOutputParser
-from langchain_core.prompt_values import PromptValue, StringPromptValue
-from langchain_core.prompts import PromptTemplate, ChatPromptTemplate, MessagesPlaceholder
+from langchain_core.output_parsers import CommaSeparatedListOutputParser
 from langchain_core.runnables import RunnablePassthrough
 from langchain_core.runnables.base import RunnableParallel, RunnableLambda, Runnable
 from langchain_core.runnables.config import RunnableConfig
+from langchain_core.output_parsers.base import BaseOutputParser
+from langchain_core.prompt_values import PromptValue, StringPromptValue
+from langchain_core.prompts import PromptTemplate, ChatPromptTemplate, MessagesPlaceholder
 from langchain_core.runnables.utils import Input, Output
 from langchain_core.vectorstores import VectorStore
 from langchain_core.vectorstores import VectorStoreRetriever
@@ -32,20 +36,20 @@ from transformers import PreTrainedTokenizerFast
 from protollm_agents.sdk.base import Event
 from protollm_agents.sdk.events import TextEvent, ErrorEvent, MultiDictEvent
 
-from examples.pipelines.utils import RunnableLogicPiece
 
 from langfuse.callback import CallbackHandler
+from examples.pipelines.utils import RunnablePiece
+
 
 logger = logging.getLogger(__name__)
 
-RAG_COMPONENT_PREFIX = "rag_"
-RAG_COMPONENT_ANSWERING_CHAIN = f"{RAG_COMPONENT_PREFIX}answering_chain"
-RAG_COMPONENT_QUESTION_CONTEXTUALIZER = f"{RAG_COMPONENT_PREFIX}question_contextualizer"
-RAG_COMPONENT_PLANNER = f"{RAG_COMPONENT_PREFIX}planner_logic_chain"
-RAG_COMPONENT_RETRIEVER_VECTOR = f"{RAG_COMPONENT_PREFIX}retriever_vector"
-RAG_COMPONENT_MAKE_CONTEXT = f"{RAG_COMPONENT_PREFIX}make_context"
-RAG_COMPONENT_ANSWER_GENERATOR = f"{RAG_COMPONENT_PREFIX}answer_generator"
-RAG_COMPONENT_WORKFLOW = f"{RAG_COMPONENT_PREFIX}workflow"
+PIPE_PREFIX = "rag_"
+PIPE_CONTEXTUALIZER = f"{PIPE_PREFIX}question_contextualizer"
+PIPE_PLANNER = f"{PIPE_PREFIX}planner_logic_chain"
+PIPE_RETRIEVER = f"{PIPE_PREFIX}retriever_vector"
+PIPE_MAKE_CONTEXT = f"{PIPE_PREFIX}make_context"
+PIPE_ANSWER_GENERATOR = f"{PIPE_PREFIX}answer_generator"
+PIPE_WORKFLOW = f"{PIPE_PREFIX}workflow"
 
 default_prompts = {
     'planner_prompt_template': ChatPromptTemplate.from_messages(
@@ -141,7 +145,7 @@ def _doc2str(doc: Document) -> str:
 async def aqwen2_convert(x: PromptValue) -> StringPromptValue:
     return qwen2_convert(x)
 
-class RAGIntermediateOutputs(BaseModel):
+class ChainOutput(BaseModel):
     # general
     question: Annotated[str, _take_any]
     chat_history: Annotated[Optional[List[BaseMessage]], _take_any] = None
@@ -153,7 +157,6 @@ class RAGIntermediateOutputs(BaseModel):
     planned_queries: Annotated[Optional[List[str]], _take_any] = None
 
     # vector store part
-    did_planning: Annotated[bool, _take_any] = False
     retrieved_documents: Annotated[Optional[List[Document]], _take_any] = None
 
     # answer generating part
@@ -188,28 +191,13 @@ class _RAGChains:
 
     def call_with(
             self,
-            func: Callable[['_RAGChains', RAGIntermediateOutputs,
-                            RunnableConfig], Awaitable[RAGIntermediateOutputs]]
-    ) -> Callable[[RAGIntermediateOutputs], Awaitable[RAGIntermediateOutputs]]:
-        async def _func(state: RAGIntermediateOutputs, config: RunnableConfig):
+            func: Callable[['_RAGChains', ChainOutput,
+                            RunnableConfig], Awaitable[ChainOutput]]
+    ) -> Callable[[ChainOutput], Awaitable[ChainOutput]]:
+        async def _func(state: ChainOutput, config: RunnableConfig):
             return await func(self, state, config)
 
-        return cast(Callable[[RAGIntermediateOutputs], Awaitable[RAGIntermediateOutputs]], _func)
-
-
-class NonStreamableVLLMOpenAI(VLLMOpenAI):
-    async def astream(
-            self,
-            input: Input,
-            config: Optional[RunnableConfig] = None,
-            **kwargs: Optional[Any],
-    ) -> AsyncIterator[Output]:
-        """
-        Default implementation of astream, which calls ainvoke.
-        Subclasses should override this method if they support streaming output.
-        """
-        yield await self.ainvoke(input, config, **kwargs)
-
+        return cast(Callable[[ChainOutput], Awaitable[ChainOutput]], _func)
 
 class PlannerOutputParser(BaseOutputParser[List[str]]):
     def parse(self, text: str) -> List[str]:
@@ -252,7 +240,7 @@ class MultiQueryRetriever:
         result = self.remove_duplicates(result)
         return result
 
-class PipelineMaxInputTokensExceededException(Exception):
+class MaxInputTokensExceededException(Exception):
     pass
 
 class RAGPipeline:
@@ -282,7 +270,6 @@ class RAGPipeline:
         self._prompts = prompts
         if not self._prompts:
             self._prompts = RAGPrompts()
-        # setting defaults if not provided with custom prompts
         for field in fields(self._prompts):
             attr_name = field.name
             if attr_name in default_prompts and getattr(self._prompts, attr_name) is None:
@@ -299,7 +286,7 @@ class RAGPipeline:
 
         self._runnable_config = runnable_config
         self._retrieving_top_k = retrieving_top_k
-        self._final_state: Optional[RAGIntermediateOutputs] = None
+        self._final_state: Optional[ChainOutput] = None
         self._include_original_question_in_queries = include_original_question_in_queries
         self._langfuse_handler = langfuse_handler
         
@@ -313,7 +300,7 @@ class RAGPipeline:
     def _get_llm_prompt_converter(self) -> Runnable[PromptValue, StringPromptValue]:
         return RunnableLambda(qwen2_convert, afunc=aqwen2_convert)
 
-    def _get_question_contextualization_chain(self) -> Runnable[Dict[str, str], str]:
+    def _get_contextualization_chain(self) -> Runnable[Dict[str, str], str]:
         chain = (
             self._prompts.contextualize_q_prompt
             | self._get_llm_prompt_converter()
@@ -322,12 +309,6 @@ class RAGPipeline:
         return chain
 
     def _get_planner_chain(self) -> Runnable[Dict[str, str], List[str]]:
-        # planner components
-        # planner_prompt = PromptTemplate(
-        #     input_variables=["question", "acronyms"], #, "current_date"],
-        #     template=planner_prompt_template,
-        #     name=RAG_COMPONENT_PLANNER_PROMPT
-        # )
         planner_llm = self._get_planner_llm()
         retry_planner_parser = RetryOutputParser.from_llm(
             parser=PlannerOutputParser(),
@@ -349,20 +330,18 @@ class RAGPipeline:
 
             return questions
 
-        # planner_chain.name = "planner_chain"
-        # TODO: can be substituted with a descendant of Chain class
         chain = (
             self._prompts.planner_prompt_template
             | self._get_llm_prompt_converter()
             | RunnableParallel(completion=planner_llm, prompt_value=RunnablePassthrough())
         )
-        planner_chain = RunnableLogicPiece(
+        planner_chain = RunnablePiece(
             step=(
                 RunnableParallel(
                     llm_out=chain, pipe_input=RunnablePassthrough())
                 | RunnableLambda(_do_planning, name="retry_planner_lambda")
             ),
-            name=RAG_COMPONENT_PLANNER
+            name=PIPE_PLANNER
         )
 
         return planner_chain
@@ -385,7 +364,7 @@ class RAGPipeline:
         multiquery_retriever = RunnableLambda(
             func=mq_retriever.do_batch,
             afunc=mq_retriever.do_abatch,
-            name=RAG_COMPONENT_RETRIEVER_VECTOR
+            name=PIPE_RETRIEVER
         )
 
         return multiquery_retriever
@@ -404,7 +383,7 @@ class RAGPipeline:
 
             return questions
 
-    def _get_answer_generator_chain(self) -> Runnable[Dict[str, str], str]:
+    def _get_answer_chain(self) -> Runnable[Dict[str, str], str]:
         answer_generator_chain = (
             self._prompts.chat_answer_prompt_template.bind(
                 year=datetime.datetime.now().year)
@@ -413,10 +392,10 @@ class RAGPipeline:
         )
         return answer_generator_chain
 
-    async def _node_acontextualize_question(self,
+    async def _acontextualize_question(self,
                                             chains: _RAGChains,
-                                            state: RAGIntermediateOutputs,
-                                            config: RunnableConfig) -> RAGIntermediateOutputs:
+                                            state: ChainOutput,
+                                            config: RunnableConfig) -> ChainOutput:
         if state.chat_history:
             contextualized_question = await chains.contextualize_q_chain.ainvoke(
                 input={"question": state.question,
@@ -428,42 +407,37 @@ class RAGPipeline:
 
         return state.copy(update={'contextualized_question': contextualized_question})
 
-    async def _node_aplanning(self,
+    async def _aplanning(self,
                               chains: _RAGChains,
-                              state: RAGIntermediateOutputs,
-                              config: RunnableConfig) -> RAGIntermediateOutputs:
+                              state: ChainOutput,
+                              config: RunnableConfig) -> ChainOutput:
         if chains.chroma_retriever_chain is not None:
             queries = await chains.planner_chain.ainvoke({
                 "question": state.contextualized_question,
-                # "current_date": datetime.datetime.now().isoformat()
             }, config=config)
             queries = [state.contextualized_question, *queries] \
                 if self._include_original_question_in_queries else queries
-            did_planning = True
         else:
             queries = [state.contextualized_question]
-            did_planning = False
 
-        # todo: add planner prompt
         result = state.copy(update={
             "planned_queries": queries,
-            "did_planning": did_planning
         })
         return result
 
-    async def _node_aretrieving(self,
+    async def _aretrieving(self,
                                 chains: _RAGChains,
-                                state: RAGIntermediateOutputs,
-                                config: RunnableConfig) -> RAGIntermediateOutputs:
+                                state: ChainOutput,
+                                config: RunnableConfig) -> ChainOutput:
         if chains.chroma_retriever_chain is None:
             return state
         docs = await chains.chroma_retriever_chain.ainvoke(state.planned_queries, config=config)
         return state.copy(update={"retrieved_documents": docs})
 
-    async def _node_amake_context(self,
+    async def _amake_context(self,
                                   chains: _RAGChains,
-                                  state: RAGIntermediateOutputs,
-                                  config: RunnableConfig) -> RAGIntermediateOutputs:
+                                  state: ChainOutput,
+                                  config: RunnableConfig) -> ChainOutput:
         paragraphs = [
             f"Источник {i + 1}: {_doc2str(doc)}" for i, doc in enumerate(state.retrieved_documents)]
 
@@ -473,7 +447,6 @@ class RAGPipeline:
         logger.debug("Available paragraphs for context building: %s" %
                      len(paragraphs))
 
-        # ensure the lengths of chunks doesn't exceed the desired threshold
         if len(paragraphs) > 0:
             psizes = np.cumsum([len(self._tokenizer.tokenize(p))
                                for p in paragraphs])
@@ -484,7 +457,6 @@ class RAGPipeline:
                                f"Selecting first chunks %s / %s."
                                % (psizes[-1], self._max_input_tokens, idx + 1, len(paragraphs)))
             else:
-                # np.argmax will return 0 if all cumsums are less than the threshold
                 idx = len(psizes) - 1
             paragraphs = paragraphs[:idx + 1]
 
@@ -497,10 +469,10 @@ class RAGPipeline:
         contexts = "\n\n".join([el for el in paragraphs_contexts if el])
         return state.copy(update={"answer_context": contexts})
 
-    async def _node_agenerate_answer(self,
+    async def _agenerate_answer(self,
                                      chains: _RAGChains,
-                                     state: RAGIntermediateOutputs,
-                                     config: RunnableConfig) -> RAGIntermediateOutputs:
+                                     state: ChainOutput,
+                                     config: RunnableConfig) -> ChainOutput:
         answer = await chains.answer_generator_chain.ainvoke(
             input={
                 "question": state.contextualized_question,
@@ -509,61 +481,55 @@ class RAGPipeline:
             },
             config=config
         )
-        # todo: add answering prompt
         return state.copy(update={"answer": answer})
 
     @staticmethod
-    def _convert_pipeline_result(question: str, result: AddableValuesDict) -> RAGIntermediateOutputs:
-        return RAGIntermediateOutputs(question=question, error=result) \
-            if isinstance(result, Exception) else RAGIntermediateOutputs(** result)
+    def _convert_pipeline_result(question: str, result: AddableValuesDict) -> ChainOutput:
+        return ChainOutput(question=question, error=result) \
+            if isinstance(result, Exception) else ChainOutput(** result)
 
-    def build_chain(self) -> Runnable[RAGIntermediateOutputs, AddableValuesDict]:
-        workflow = StateGraph(RAGIntermediateOutputs)
+    def _build(self) -> Runnable[ChainOutput, AddableValuesDict]:
+        workflow = StateGraph(ChainOutput)
 
-        # assemble the chain
         cs = _RAGChains(
-            contextualize_q_chain=self._get_question_contextualization_chain(),
+            contextualize_q_chain=self._get_contextualization_chain(),
             planner_chain=self._get_planner_chain(),
             chroma_retriever_chain=self._get_retriever_chain(),
-            answer_generator_chain=self._get_answer_generator_chain()
+            answer_generator_chain=self._get_answer_chain()
         )
 
-        workflow.add_node(RAG_COMPONENT_QUESTION_CONTEXTUALIZER,
-                          cs.call_with(self._node_acontextualize_question))
-        workflow.add_node(RAG_COMPONENT_PLANNER,
-                          cs.call_with(self._node_aplanning))
-        workflow.add_node(RAG_COMPONENT_RETRIEVER_VECTOR,
-                          cs.call_with(self._node_aretrieving))
-        workflow.add_node(RAG_COMPONENT_MAKE_CONTEXT,
-                          cs.call_with(self._node_amake_context))
-        workflow.add_node(RAG_COMPONENT_ANSWER_GENERATOR,
-                          cs.call_with(self._node_agenerate_answer))
+        workflow.add_node(PIPE_CONTEXTUALIZER,
+                          cs.call_with(self._acontextualize_question))
+        workflow.add_node(PIPE_PLANNER,
+                          cs.call_with(self._aplanning))
+        workflow.add_node(PIPE_RETRIEVER,
+                          cs.call_with(self._aretrieving))
+        workflow.add_node(PIPE_MAKE_CONTEXT,
+                          cs.call_with(self._amake_context))
+        workflow.add_node(PIPE_ANSWER_GENERATOR,
+                          cs.call_with(self._agenerate_answer))
 
-        # workflow start, initial question and context preparation
         workflow.add_edge(START,
-                          RAG_COMPONENT_QUESTION_CONTEXTUALIZER)
-        workflow.add_edge(RAG_COMPONENT_QUESTION_CONTEXTUALIZER,
-                          RAG_COMPONENT_PLANNER)
-        # retrieving
-        workflow.add_edge(RAG_COMPONENT_PLANNER,
-                          RAG_COMPONENT_RETRIEVER_VECTOR)
+                          PIPE_CONTEXTUALIZER)
+        workflow.add_edge(PIPE_CONTEXTUALIZER,
+                          PIPE_PLANNER)
+        workflow.add_edge(PIPE_PLANNER,
+                          PIPE_RETRIEVER)
 
-        # merge of retrieved documents and prepare of the context
-        workflow.add_edge(RAG_COMPONENT_RETRIEVER_VECTOR,
-                          RAG_COMPONENT_MAKE_CONTEXT)
+        workflow.add_edge(PIPE_RETRIEVER,
+                          PIPE_MAKE_CONTEXT)
 
-        # answer generating
-        workflow.add_edge(RAG_COMPONENT_MAKE_CONTEXT,
-                          RAG_COMPONENT_ANSWER_GENERATOR)
-        workflow.add_edge(RAG_COMPONENT_ANSWER_GENERATOR,
+        workflow.add_edge(PIPE_MAKE_CONTEXT,
+                          PIPE_ANSWER_GENERATOR)
+        workflow.add_edge(PIPE_ANSWER_GENERATOR,
                           END)
 
         wf = workflow.compile()
-        wf.name = RAG_COMPONENT_WORKFLOW
+        wf.name = PIPE_WORKFLOW
         return wf
 
     @staticmethod
-    def _convert_chat_history(chat_history: Optional[List[BaseMessage] | List[Tuple[str, str]]]) -> List[BaseMessage]:
+    def _convert_history(chat_history: Optional[List[BaseMessage] | List[Tuple[str, str]]]) -> List[BaseMessage]:
         def _convert_tuple(msg_type: str, msg: str) -> BaseMessage:
             supported_msg_types = ["system", "human", "ai"]
 
@@ -589,7 +555,7 @@ class RAGPipeline:
                              "It should be either BaseMessage or Tuple")
 
     @staticmethod
-    def _cut_chat_history(chat_history: Optional[List[BaseMessage] | List[Tuple[str, str]]],
+    def _cut_history(chat_history: Optional[List[BaseMessage] | List[Tuple[str, str]]],
                           threshold: int,
                           tokenizer: PreTrainedTokenizerFast) -> List[BaseMessage]:
         if not chat_history or len(chat_history) == 0:
@@ -607,29 +573,29 @@ class RAGPipeline:
     def _check_num_input_tokens(self, question: str):
         tokens = self._tokenizer.tokenize(question)
         if len(tokens) > self._max_input_tokens:
-            raise PipelineMaxInputTokensExceededException(
+            raise MaxInputTokensExceededException(
                 f"Input length {len(tokens)} exceeds allowed max number of tokens {self._max_input_tokens}."
             )
             
     async def stream(self, question: str, chat_history: list[tuple[str, str]], raise_if_error: bool = False) -> AsyncGenerator[Event, None]:
         current_output = ''
-        chain = self.build_chain()
+        chain = self._build()
         try:
             self._check_num_input_tokens(question)
-            chat_history = self._convert_chat_history(chat_history)
-            chat_history = self._cut_chat_history(
+            chat_history = self._convert_history(chat_history)
+            chat_history = self._cut_history(
             chat_history, self._max_chat_history_token_length, self._tokenizer)
 
             conf = self._runnable_config if self._runnable_config else {"callbacks": [self._langfuse_handler] } if self._langfuse_handler else None
             async for event in chain.astream_events(
-                    RAGIntermediateOutputs(
+                    ChainOutput(
                         question=question, chat_history=chat_history),
                     config=conf,
                     version="v2",
-                    # stream_mode="values"
+                    stream_mode="values"
             ):
-                if event['event'] == 'on_chain_stream' and event['name'] == RAG_COMPONENT_MAKE_CONTEXT:
-                    state = cast(RAGIntermediateOutputs,
+                if event['event'] == 'on_chain_stream' and event['name'] == PIPE_MAKE_CONTEXT:
+                    state = cast(ChainOutput,
                                  event['data']['chunk'])
 
                     stream_event = MultiDictEvent(
@@ -644,8 +610,8 @@ class RAGPipeline:
                 elif event['event'] == 'on_llm_end' and event['name'] == self._generator_model.bound.name:
                     stream_event = TextEvent(
                         agent_id=self.agent_id, name='answer', result=event['data']['output']['generations'][0][0]['text'], is_eos=True)
-                elif event['event'] == 'on_chain_end' and event['name'] == RAG_COMPONENT_WORKFLOW:
-                    self._final_state = RAGIntermediateOutputs.parse_obj(
+                elif event['event'] == 'on_chain_end' and event['name'] == PIPE_WORKFLOW:
+                    self._final_state = ChainOutput.parse_obj(
                         event["data"]["output"])
                     stream_event = None
                     logger.debug(msg=str(self._final_state))
@@ -666,20 +632,18 @@ class RAGPipeline:
                      question: str,
                      chat_history: Optional[List[BaseMessage]
                                             | List[Tuple[str, str]]] = None,
-                     raise_if_error: bool = False) -> RAGIntermediateOutputs:
-        chain = self.build_chain()
+                     raise_if_error: bool = False) -> ChainOutput:
+        chain = self._build()
 
         self._check_num_input_tokens(question)
-        chat_history = self._convert_chat_history(chat_history)
-        chat_history = self._cut_chat_history(
+        chat_history = self._convert_history(chat_history)
+        chat_history = self._cut_history(
             chat_history, self._max_chat_history_token_length, self._tokenizer)
 
-        # we will retrieve all results through callback
         conf = self._runnable_config if self._runnable_config else {"callbacks": [self._langfuse_handler] } if self._langfuse_handler else None
         result = await chain.ainvoke(
-            RAGIntermediateOutputs(
+            ChainOutput(
                 question=question, chat_history=chat_history),
             config=conf,
-            # return_exceptions=not raise_if_error
         )
         return self._convert_pipeline_result(question, result)
