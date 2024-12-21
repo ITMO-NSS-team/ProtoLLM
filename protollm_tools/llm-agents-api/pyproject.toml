@@ -1,0 +1,53 @@
+[tool.poetry]
+name = "llm-agents-api"
+version = "0.1.0"
+description = ""
+authors = []
+readme = "README.md"
+packages = [{include = "protollm_agents"}]
+
+[tool.poetry.dependencies]
+python = "^3.10"
+fastapi = "^0.115.6"
+sqlalchemy = "^2.0.36"
+asyncpg = "^0.30.0"
+redis = {extras = ["asyncio"], version = "^5.2.1"}
+pydantic = "^2.10.3"
+pydantic-settings = "^2.6.1"
+uvicorn = "^0.32.1"
+gunicorn = "^23.0.0"
+orjson = "^3.10.12"
+websockets = "^14.1"
+chromadb = "0.5.11"
+langchain = "^0.3.12"
+pyyaml = "^6.0.2"
+langchain-openai = "^0.2.12"
+langchain-community = "^0.3.12"
+elasticsearch = {extras = ["async"], version = "^8.17.0"}
+transformers = "^4.47.1"
+torch = "2.2.2"
+langgraph = "^0.2.60"
+langfuse = "^2.57.0"
+
+
+[tool.poetry.group.dev.dependencies]
+pytest = "^8.3.4"
+pytest-docker = "^3.1.1"
+psycopg2-binary = "^2.9.10"
+pytest-dotenv = "^0.5.2"
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["."]
+env_files = ["tests/.env.test"]
+filterwarnings = [
+    "ignore::DeprecationWarning"
+]
+log_cli = true
+log_cli_level = "INFO"
+log_cli_format = "%(asctime)s [%(levelname)8s] %(message)s (%(filename)s:%(lineno)s)"
+log_cli_date_format = "%Y-%m-%d %H:%M:%S %Z"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"

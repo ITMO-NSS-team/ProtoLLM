@@ -1,0 +1,77 @@
+app_port: 8080
+app_host: 0.0.0.0
+redis_host: 0.0.0.0
+redis_port: 55531
+postgres_host: 0.0.0.0
+postgres_port: 55530
+postgres_user: test
+postgres_password: test
+postgres_db: test
+agents:
+  - name: rag_environment 
+    agent_id: 07dd7db1-075a-4391-b537-6fbca4d5a5f6
+    description: Поиск по базе докуметов компании
+    class_path: examples.pipelines.rag_agent.RAGAgent
+    default_params:
+      max_input_tokens: 6144
+      max_chat_history_token_length: 24576
+      retrieving_top_k: 2
+      generator_context_top_k: 2
+      include_original_question_in_queries: True
+      planner_model_name: planner_llm
+      generator_model_name: generator_llm
+      tokenizer_name: qwen_2.5
+      store_name: chroma_environment 
+  - name: rag_education 
+    agent_id: 3208a446-d847-45a8-a724-159fa87334b9
+    description: Поиск по документам политики развития образования
+    class_path: examples.pipelines.rag_agent.RAGAgent
+    default_params:
+      max_input_tokens: 6144
+      max_chat_history_token_length: 24576
+      retrieving_top_k: 2
+      generator_context_top_k: 2
+      include_original_question_in_queries: True
+      planner_model_name: planner_llm
+      generator_model_name: generator_llm
+      tokenizer_name: qwen_2.5
+      store_name: chroma_education 
+  - name: rag_union 
+    agent_id: 2fb8e8f0-bd05-5eca-8e4d-376ede293e52
+    description: Поиск по документам политики развития образования
+    class_path: examples.pipelines.rag_agent.RAGAgent
+    default_params:
+      max_input_tokens: 6144
+      max_chat_history_token_length: 24576
+      retrieving_top_k: 2
+      generator_context_top_k: 2
+      include_original_question_in_queries: True
+      planner_model_name: planner_llm
+      generator_model_name: generator_llm
+      tokenizer_name: qwen_2.5
+      store_name: chroma_union 
+vector_stores:
+  - type: chroma
+    params:
+      name: chroma_education
+      description: vector_store_description
+      host: 0.0.0.0
+      port: 57776
+      collection_name: test_collection_1
+      embeddings_model_name: e5-mistral-7b-instruct
+  - type: chroma
+    params:
+      name: chroma_environment 
+      description: vector_store_description
+      host: 0.0.0.0
+      port: 57776
+      collection_name: test_collection_2
+      embeddings_model_name: e5-mistral-7b-instruct
+  - type: chroma
+    params:
+      name: chroma_union 
+      description: vector_store_description
+      host: 0.0.0.0
+      port: 57776
+      collection_name: test_collection_3
+      embeddings_model_name: e5-mistral-7b-instruct

@@ -1,0 +1,29 @@
+services:
+  db:
+    image: postgres:16
+    ports:
+      - 55530:5432
+    env_file:
+      - .env
+    volumes:
+       - postgres-data:/var/lib/postgresql/data
+
+  cache:
+    image: redis:7.2-alpine
+    volumes:
+      - redis-data:/data
+    ports:
+      - 55531:6379
+
+  vectorstore:
+    image: chromadb/chroma:0.5.11
+    ports:
+      - "57777:8000"
+    volumes:
+      - vectorstore-data:/chroma/chroma
+
+volumes:
+  postgres-data:
+  redis-data:
+  vectorstore-data:
+    external: true

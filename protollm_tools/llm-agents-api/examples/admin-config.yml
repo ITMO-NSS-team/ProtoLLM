@@ -1,0 +1,119 @@
+app_port: 8080
+app_host: 0.0.0.0
+redis_host: d.dgx
+redis_port: 55531
+postgres_host: d.dgx
+postgres_port: 55530
+postgres_user: user
+postgres_password: password
+postgres_db: agents
+agents:
+  - name: rag_environment 
+    agent_id: 07dd7db1-075a-4391-b537-6fbca4d5a5f6
+    description: Поиск по базе докуметов политики защиты окружающей среды
+    class_path: examples.pipelines.rag_agent.RAGAgent
+    default_params:
+      max_input_tokens: 6144
+      max_chat_history_token_length: 24576
+      retrieving_top_k: 2
+      generator_context_top_k: 2
+      include_original_question_in_queries: True
+      planner_model_name: planner_llm
+      generator_model_name: generator_llm
+      tokenizer_name: qwen_2.5
+      store_name: chroma_environment 
+  - name: rag_education 
+    agent_id: 3208a446-d847-45a8-a724-159fa87334b9
+    description: Поиск по документам политики развития образования
+    class_path: examples.pipelines.rag_agent.RAGAgent
+    default_params:
+      max_input_tokens: 6144
+      max_chat_history_token_length: 24576
+      retrieving_top_k: 2
+      generator_context_top_k: 2
+      include_original_question_in_queries: True
+      planner_model_name: planner_llm
+      generator_model_name: generator_llm
+      tokenizer_name: qwen_2.5
+      store_name: chroma_education
+  - name: rag_union
+    agent_id: 2fb8e8f0-bd05-5eca-8e4d-376ede293e52
+    description: Поиск по документам документам политик защиты окружающей среды и развития
+    class_path: examples.pipelines.rag_agent.RAGAgent
+    default_params:
+      max_input_tokens: 6144
+      max_chat_history_token_length: 24576
+      retrieving_top_k: 2
+      generator_context_top_k: 2
+      include_original_question_in_queries: True
+      planner_model_name: planner_llm
+      generator_model_name: generator_llm
+      tokenizer_name: qwen_2.5
+      store_name: chroma_union 
+models:
+  - type: completion
+    params:
+      model: /model
+      temperature: 0.01
+      top_p: 0.95
+      streaming: false
+      name: planner_llm
+      url: http://d.dgx:8001/v1
+      api_key: token-abc123
+  - type: completion
+    params:
+      model: /model
+      temperature: 0.01
+      top_p: 0.95
+      streaming: true
+      name: generator_llm
+      url: http://d.dgx:8001/v1
+      api_key: token-abc123
+  - type: chat
+    params:
+      model: /model
+      temperature: 0.01
+      top_p: 0.95
+      streaming: true
+      name: router_llm
+      url: http://d.dgx:8001/v1
+      api_key: token-abc123
+  - type: embedding
+    params:
+      name: e5-mistral-7b-instruct
+      url: http://d.dgx:58891/v1
+      api_key: token-abc123
+      model: /models/e5-mistral-7b-instruct
+      check_embedding_ctx_length: false
+      tiktoken_enabled: false
+  - type: tokenizer
+    params:
+      name: qwen_2.5
+      path_or_repo_id: Qwen/Qwen2.5-7B-Instruct
+vector_stores:
+  - type: chroma
+    params:
+      name: chroma_education
+      description: vector_store_description
+      host: d.dgx
+      port: 57777
+      collection_name: education
+      embeddings_model_name: e5-mistral-7b-instruct
+  - type: chroma
+    params:
+      name: chroma_environment 
+      description: vector_store_description
+      host: d.dgx
+      port: 57777
+      collection_name: environment 
+      embeddings_model_name: e5-mistral-7b-instruct
+  - type: chroma
+    params:
+      name: chroma_union
+      description: vector_store_description
+      host: d.dgx
+      port: 57777
+      collection_name: union 
+      embeddings_model_name: e5-mistral-7b-instruct
+
+
