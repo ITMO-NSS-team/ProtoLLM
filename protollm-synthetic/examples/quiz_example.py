@@ -18,12 +18,12 @@ with open('tmp_data/sample_data_rag.json', 'w', encoding='utf-8') as file:
 
 dataset = Dataset(data_col='content', path='tmp_data/sample_data_rag.json')
 
-qwen2vl_api_key = os.environ.get("QWEN2VL_OPENAI_API_KEY")
-qwen2vl_api_base = os.environ.get("QWEN2VL_OPENAI_API_BASE")
+qwen_large_api_key = os.environ.get("OPENAI_API_KEY")
+qwen_large_api_base = os.environ.get("OPENAI_API_BASE")
 
 llm=VLLMChatOpenAI(
-        api_key=qwen2vl_api_key,
-        base_url=qwen2vl_api_base,
+        api_key=qwen_large_api_key,
+        base_url=qwen_large_api_base,
         model="/model",
         max_tokens=2048,
         # max_concurrency=10

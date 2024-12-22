@@ -95,4 +95,28 @@ class FreeQueryScheme(BaseModel):
         ...,
         description="Define a set of strict rules and domain specific information for llm to know and follow, e.g. '1. The question should be in the same language as the text, 2. The question should be easy to understand and follow, 3. The question should be a free-answer question'"
     )
+    system_output_format_part: str = Field(
+        ...,
+        description="Define the output format of the llm, e.g. 'The output should be a json object with the following fields: question, options, correct_options'"
+    )
+
+
+class FreeQueryMerger(BaseModel):
+    system_role_part: str = Field(
+        ...,
+        description="Merge the proposed role parts into one role"
+    )
+    system_general_instruction_part: str = Field(
+        ...,
+        description="Merge the proposed general instruction parts into one general instruction"
+    )
+    system_specifics_instruction_part: str = Field(
+        ...,
+        description="Merge the proposed specifics instruction parts into one detailed instruction"
+    )
+    system_output_format_part: str = Field(
+        ...,
+        description="Merge the proposed output format parts into one output format"
+    )       
+
 

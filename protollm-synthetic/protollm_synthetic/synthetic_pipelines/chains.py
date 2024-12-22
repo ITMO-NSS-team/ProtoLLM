@@ -1,16 +1,19 @@
 from typing import List
 import json
 import copy
+from datetime import datetime
 import logging
 from samplefactory.synthetic_pipelines.prompts import (generate_summary_system_prompt, generate_summary_evaluation_system_prompt,
                                                         generate_rag_system_prompt, check_summary_quality_human_prompt,
                                                         generate_rag_human_prompt, generate_aspect_summarisation_prompt,
                                                         generate_summary_human_prompt, generate_aspect_summarisation_evaluation_system_prompt,
-                                                        generate_quiz_system_prompt, generate_quiz_human_prompt)
+                                                        generate_quiz_system_prompt, generate_quiz_human_prompt,
+                                                        generate_instruction_one_shot_system_prompt, generate_instruction_one_shot_human_prompt,
+                                                        merge_instructions, merge_instructions_human_prompt)
 from samplefactory.utils import Dataset
 import numpy as np
 import asyncio
-from typing import List, Optional, Dict, Any, TypeVar, Union, cast
+from typing import List, Optional, Dict, Any, TypeVar, cast
 
 from langchain_core.prompts import ChatPromptTemplate, SystemMessagePromptTemplate, HumanMessagePromptTemplate
 from langchain.output_parsers import RetryOutputParser
@@ -28,7 +31,7 @@ from samplefactory.synthetic_pipelines.genetic_evolver import GeneticEvolver
 import random
 from samplefactory.synthetic_pipelines.schemes import (SummaryQualitySchema, 
                                                        RAGScheme, AspectSummarisationQualitySchema,
-                                                       QuizScheme, FreeQueryScheme)
+                                                       QuizScheme, FreeQueryScheme, FreeQueryMerger)
 
 import pandas as pd
 
@@ -62,12 +65,15 @@ class BaseChain:
     def _prepare_prompt(self, system_template, human_template, x: Dict[str, Any]) -> PromptValue:
         prompt = ChatPromptTemplate(
             messages=[
-                SystemMessagePromptTemplate.from_template([{"text": system_template}]),
+                SystemMessagePromptTemplate.from_template([{"text": system_template.replace('"',"")}]),
                 HumanMessagePromptTemplate.from_template([{"text": human_template}])
             ]
         )
 
         args = x.copy()
+        if "date" not in args:
+            args["date"] = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+
         prompt_value = prompt.invoke(args)
         return prompt_value
 
@@ -152,8 +158,9 @@ class BaseChain:
 
     def save_chain_output(self, path: str):
         if 'generated' in self.data.columns:  
-            with open(path, 'w') as f:
-                json.dump(self.data, f)
+            recordings = self.data.to_dict()
+            with open(path, 'w', encoding='utf-8') as file:
+                json.dump(recordings, file, ensure_ascii=False)
         else:
             logger.warning("No output to save. Chain has not been run.")
 
@@ -195,10 +202,18 @@ class SummarisationChain(BaseChain):
         good_indices = [i for i in range(len(quality)) if quality[i].score > 0.8]
         return good_indices
     
+    async def _generate_genetic_evolution(self, dataset: Dataset) -> str:
+        # TODO: implement genetic evolution
+        genetic_evolver = GeneticEvolver(initial_population=dataset.data[dataset.data_col].tolist(), 
+                                        generations=10, mutation_rate=0.1)
+        results = genetic_evolver.evolve()
+        return results
+    
     async def run(self, 
             dataset: Dataset, 
             n_examples: int = 3,
-            do_postprocess: bool = True
+            do_postprocess: bool = True,
+            do_genetic_evolution: bool = False
             ) -> str:
         data = dataset.data[dataset.data_col].tolist()
         # sampling without changing the order of the data
@@ -213,6 +228,9 @@ class SummarisationChain(BaseChain):
         if do_postprocess:
             good_indices = await self.postprocess(summaries, data)
             dataset.data = dataset.data.iloc[good_indices]
+        if len(dataset.data) > 10 and do_genetic_evolution:
+            genetic_evolution = await self._generate_genetic_evolution(dataset)
+            dataset.data['generated'] = genetic_evolution
         return summaries
     
 # TODO: Implement aspect summarisation chain
@@ -246,7 +264,9 @@ class AspectSummarisationChain(BaseChain):
     async def run(self, 
                   dataset: Dataset, 
                   aspect: str,
-                  n_examples: int = 3) -> str:
+                  n_examples: int = 3,
+                  do_genetic_evolution: bool = False
+                  ) -> str:
         data = self._sample_data(dataset.data, n_examples)  # Use the new sampling method
         logger.info(f"Running aspect summarisation chain on {n_examples} examples")
         summaries = await self._generate_aspect_summaries(data[dataset.data_col].tolist(), aspect=aspect)
@@ -256,6 +276,9 @@ class AspectSummarisationChain(BaseChain):
         logger.info(f"Summary examples: {random.sample(summaries, 1)}")
         quality = await self._evaluate_summary_quality(summaries, data[dataset.data_col].tolist(), aspect=aspect)
         logger.info(f"Summary Quality: {np.mean([int(sample.score) for sample in quality])}")
+        if len(dataset.data) > 10 and do_genetic_evolution:
+            genetic_evolution = await self._generate_genetic_evolution(dataset)
+            dataset.data['generated'] = genetic_evolution
         return summaries
     
     # TODO: Implement postprocessing of the dataset
@@ -281,22 +304,38 @@ class RAGChain(BaseChain):
 
     async def run(self, 
                   dataset: Dataset, 
-                  n_examples: int = 3) -> str:
+                  n_examples: int = 3,
+                  do_genetic_evolution: bool = False
+                  ) -> str:
         self.data = copy.deepcopy(dataset.data)
         self._sample_data(n_samples=n_examples)  # Use the new sampling method
         logger.info(f"Running RAG chain on {n_examples} examples")
         rag_examples = await self._generate_rag_examples(self.data[dataset.data_col].tolist())
-        logger.info(f"RAG examples: {random.sample(rag_examples, 1)}")
+        logger.info(f"RAG num examples generated: {len(rag_examples)}")
+        # logger.debug(f"RAG examples: {random.sample(rag_examples, 1)}")
         print(len(rag_examples), len(self.data))
-        self.data['generated'] = [[{'question': rag_examples[i].context[j].question, 
-                                      'answer': rag_examples[i].context[j].answer, 
-                                      'difficulty': rag_examples[i].context[j].difficulty} for j in range(len(rag_examples[i].context))
-                                      ] for i in range(len(rag_examples))]
+        self.data['generated'] = [
+            [
+                {
+                    'question': rag_examples[i].context[j].question,
+                    'answer': rag_examples[i].context[j].answer,
+                    'difficulty': rag_examples[i].context[j].difficulty
+                }
+                for j in range(len(rag_examples[i].context))
+                if rag_examples[i].context[j] is not None
+             ]
+            for i in range(len(rag_examples))
+            if rag_examples[i] is not None
+        ]
+        if len(dataset.data) > 10 and do_genetic_evolution:
+            genetic_evolution = await self._generate_genetic_evolution(dataset)
+            dataset.data['generated'] = genetic_evolution
+
         return rag_examples
 
 
 class QuizChain(BaseChain):
-    def __init__(self, llm: Optional[BaseChatModel] = None):
+    def __init__(self, llm: BaseChatModel):
         super().__init__(llm=llm)
 
 
@@ -314,7 +353,8 @@ class QuizChain(BaseChain):
     async def run(self, 
                   dataset: Dataset, 
                   n_examples: int = 3,
-                  do_postprocess: bool = False
+                  do_postprocess: bool = False,
+                  do_genetic_evolution: bool = False
                   ) -> str:
         self.data = copy.deepcopy(dataset.data)
         self._sample_data(n_samples=n_examples)
@@ -323,33 +363,60 @@ class QuizChain(BaseChain):
         self.data['generated'] = quiz
         if do_postprocess:
             dataset = self.postprocess(self.data)
+        if len(dataset.data) > 10 and do_genetic_evolution:
+            genetic_evolution = await self._generate_genetic_evolution(dataset)
+            dataset.data['generated'] = genetic_evolution
         return quiz
 
 class FreeQueryChain(BaseChain):
     def __init__(self, llm: Optional[BaseChatModel] = None):
         super().__init__(llm=llm)
 
-    def _generate_free_query_instruction(self, dataset: Dataset) -> List[FreeQueryScheme]:
-        dataset.labeled_data
-        raise NotImplementedError("Not implemented")
+    async def _generate_free_query_instruction(self, examples: List[str], solutions: List[str]) -> List[FreeQueryScheme]:
+        parser = PydanticOutputParser(pydantic_object=FreeQueryScheme)
+        # TODO: add few-shot instruction prompt
+        chain = self.create_chain(system_template=generate_instruction_one_shot_system_prompt(), 
+                                  human_template=generate_instruction_one_shot_human_prompt(),
+                                  parser=parser)
+        free_query_instruction = await chain.abatch(inputs=[{'text': i, 'result': j} for i, j in zip(examples, solutions)])
+        return free_query_instruction
     
-    def _combine_free_query_instruction(self, dataset: Dataset) -> str:
-        raise NotImplementedError("Not implemented")
+    async def _combine_free_query_instruction(self, free_query_instruction: List[FreeQueryScheme]) -> str:
+        parser = PydanticOutputParser(pydantic_object=FreeQueryMerger)
+        chain = self.create_chain(system_template=merge_instructions(), 
+                                  human_template=merge_instructions_human_prompt(),
+                                  parser=parser)
+        
+        merged_instruction = await chain.abatch(inputs=[{'text': [json.dumps(i.model_dump()) for i in free_query_instruction]}])
+        return merged_instruction
+    
+    async def _generate_result_with_instruction(self, instruction: FreeQueryMerger, 
+                                                text: List[str], num_retries: int = 3) -> str:
+        complete_system_prompt = f"""{instruction.system_role_part} \n\n
+        {instruction.system_general_instruction_part} \n\n  
+        {instruction.system_specifics_instruction_part} \n\n
+        {instruction.system_output_format_part}"""
+        human_prompt = """Text that should be transformed: {text}"""
+        chain = self.create_chain(system_template=complete_system_prompt, 
+                                  human_template=human_prompt,)
+        for i in range(3):
+            try:
+                result = await chain.abatch(inputs=[{'text': i} for i in text])
+                return result
+            except Exception as e:
+                logger.error(f"Error during result generation: {e}")
+        return result
 
-    def run(self, dataset: Dataset, n_examples: int = 3, 
+    async def run(self, dataset: Dataset, 
+            n_examples: int = 3, 
             initial_instruction: str = None) -> str:
         self.data = copy.deepcopy(dataset.data)
         self._sample_data(n_samples=n_examples)
         logger.info(f"Running free query chain on {n_examples} examples: Instruction Extraction")
-        free_query_instruction = self._generate_free_query_instruction(self.data, initial_instruction)
-
-        return free_query_instruction
-
-
-class GeneticEvolverChain(BaseChain):
-    def __init__(self, llm: Optional[BaseChatModel] = None):
-        super().__init__(llm=llm)
-
-    def run(self, text: str) -> str:
-
-        raise NotImplementedError("Not implemented")
+        free_query_instruction = await self._generate_free_query_instruction(dataset.labeled_data[dataset.data_col].tolist(), 
+                                                                       dataset.labeled_data[dataset.labels_col].tolist())
+        logger.info(f"Running free query chain on {n_examples} examples: Instruction Merging")
+        merged_instruction = await self._combine_free_query_instruction(free_query_instruction)
+        logger.info(f"Running free query chain on {n_examples} examples: Result Generation")
+        result = await self._generate_result_with_instruction(merged_instruction[0], dataset.data[dataset.data_col].tolist())
+        self.data['generated'] = result
