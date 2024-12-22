@@ -12,7 +12,7 @@ def generate_summary_human_prompt() -> str:
 def generate_detailed_summary_prompt(text: str) -> str:
     return """Provide a detailed summary of the following text, highlighting key points and important details, in the same language as the original text."""
 
-def generate_bullet_point_summary_prompt(text: str) -> str  :
+def generate_bullet_point_summary_system_prompt(text: str) -> str  :
     return f"Summarize the following text using bullet points for clarity, in the same language as the original text:\n\n{text}\n\nBullet Point Summary:"
 
 def generate_question_based_summary_prompt(text: str) -> str    :
@@ -92,7 +92,7 @@ def generate_instruction_design_prompt(tasks: List[str], solutions: List[str]) -
         f"{task_solution_pairs}\n\nInstruction:"
     )
 
-def generate_instruction_one_shot() -> str:
+def generate_instruction_one_shot_system_prompt() -> str:
     return """Design an instruction for yourself to transform the following text to the provided result.
     You will be provided with some text and result that user want to obtain from the text.
     You should define the instruction following the rules below:
@@ -101,17 +101,27 @@ def generate_instruction_one_shot() -> str:
     Return answer in the following format:
     {response_format_description}"""
 
+def generate_instruction_one_shot_human_prompt() -> str:
+    return """Text that should be transformed:
+    {text}
+    Result that should be obtained:
+    {result}"""
+
 def merge_instructions() -> str:
-    return """Merge the following instructions into one instruction.
-    You will be provided with some instructions and you need to merge them into one instruction.
+    return """Merge the following instructions into one instruction according to the set of presented fields.
+    You will be provided with several instructions to transform text into the predefined resultand you need to merge them into one json instruction.
     Save as much details as possible to save the quality of instructions.
     Return answer in the following format:
     {response_format_description}"""
 
+def merge_instructions_human_prompt() -> str:
+    return """Instructions to merge in json format:
+    {text}"""
+
 # Augmentation
 
 def paraphrase_text() -> str:
-    return f"Paraphrase the following text in a concise manner, in the same language as the original text:\n\n{text}\n\nParaphrased Text:"
+    return "Paraphrase the following text in a concise manner, in the same language as the original text:\n\n{text}\n\nParaphrased Text:"
 
 # Evaluation
 

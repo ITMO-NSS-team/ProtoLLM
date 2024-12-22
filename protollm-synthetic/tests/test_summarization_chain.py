@@ -25,14 +25,6 @@ class TestSummarizationChain(unittest.TestCase):
             "Python is a popular language."
         ]
 
-        # proxy_url = os.environ.get("PROXY_URL")
-        # openai_api_key = os.environ.get("CHATGPT_OPENAI_API_KEY")
-        # llm=ChatOpenAI(
-        #         api_key=openai_api_key,
-        #         http_client=httpx.AsyncClient(proxy=proxy_url) if proxy_url else None,
-        #         timeout=60.0
-        #     )
-
         qwen2vl_api_key = os.environ.get("QWEN2VL_OPENAI_API_KEY")
         qwen2vl_api_base = os.environ.get("QWEN2VL_OPENAI_API_BASE")
 

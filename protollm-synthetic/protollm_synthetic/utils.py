@@ -17,6 +17,7 @@ class Dataset:
         self.data_col = data_col
         self.max_chunk_size = max_chunk_size
         self.data = None
+        self.labeled_data = None
         self.load()
 
     def load(self):
@@ -46,8 +47,8 @@ class Dataset:
 
 
     def get_labeled_data(self):
-        self.labeled_data = self.data[self.data.columns[self.labels_col]]
-        self.data = self.data[self.data.columns[~self.labels_col]]
+        self.labeled_data = self.data[self.data[self.labels_col].notna()]
+        self.data = self.data[self.data[self.labels_col].isna()]
 
     def train_test_split(self, test_size: float = 0.2):
         raise NotImplementedError("Not implemented")
