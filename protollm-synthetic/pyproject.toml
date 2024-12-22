@@ -1,0 +1,20 @@
+[tool.poetry]
+name = "samplefactory"
+version = "0.1.0"
+description = "Sample generation with LLMs"
+authors = ["Your Name <you@example.com>"]
+license = "BSD 3-Clause License"
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.13"
+langchain = "^0.3.12"
+langchain-core = "^0.3.25"
+langchain-openai = "^0.2.12"
+langchain-community = "^0.3.12"
+pandas = "^2.2.3"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
