@@ -14,7 +14,7 @@ from protollm_api.backend.broker import send_task
 
 @pytest.fixture(scope="module")
 def redis_client(test_real_config):
-    assert test_real_config.redis_host != "localhost"
+    assert test_real_config.redis_host == "localhost"
     client = RedisWrapper(test_real_config.redis_host, test_real_config.redis_port)
     return client
 
