@@ -1,1 +1,1 @@
-Пока тут пустовато
+SDK is a module for intaraction with LLMs in asynchronous task-based mode.
