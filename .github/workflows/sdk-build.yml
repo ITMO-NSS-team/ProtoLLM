@@ -40,6 +40,7 @@ jobs:
           python -m pip install --upgrade pip
           pip install pytest
           pip install pytest-asyncio
+          pip install .
           pip install -r ./protollm_tools/sdk/requirements.txt
       - name: Test sdk with pytest
         run: |
