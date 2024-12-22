@@ -1,4 +1,4 @@
-name: Integration build
+name: Integration Build
 
 on:
   schedule:
