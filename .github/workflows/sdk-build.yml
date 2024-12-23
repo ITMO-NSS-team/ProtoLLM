@@ -47,4 +47,5 @@ jobs:
           pip install -e .
       - name: Test sdk with pytest
         run: |
+          cd ./protollm_tools/sdk
           pytest -s ./tests
