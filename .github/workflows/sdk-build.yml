@@ -35,15 +35,16 @@ jobs:
         uses: actions/setup-python@v2
         with:
           python-version: ${{ matrix.python-version }}
-      - name: Install sdk dependencies
+      - name: Install pytest dependencies
         run: |
           python -m pip install --upgrade pip
           pip install pytest
           pip install pytest-asyncio
-          pip install -r ./protollm_tools/sdk/requirements.txt
-      - name: Set PYTHONPATH
-        run: | 
-          echo "PYTHONPATH=$GITHUB_WORKSPACE" >> $GITHUB_ENV
+      - name: Change directory and install sdk dependencies
+        run: |
+          cd ./protollm_tools/sdk
+          pip install -r requirements.txt
+          pip install -e .
       - name: Test sdk with pytest
         run: |
-          pytest -s ./protollm_tools/sdk/tests
+          pytest -s ./tests
