@@ -82,6 +82,7 @@ def text_embedder_request():
 
 # ---------------------------- Function Tests ----------------------------
 
+@pytest.mark.skip(reason="Error: [Errno 111] Connection refused.")
 def test_text_embedder_inference(text_embedder, text_embedder_request):
     """
     Tests that the inference method returns a valid TextEmbedderResponse.
