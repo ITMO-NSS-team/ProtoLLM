@@ -13,7 +13,7 @@ class PromptMeta(BaseModel):
     temperature: float | None = 0.2
     tokens_limit: int | None = 8096
     stop_words: list[str] | None = None
-    model: str | None = None
+    model: str | None = Field(default=None, examples=[None])
 
 
 class PromptModel(BaseModel):
