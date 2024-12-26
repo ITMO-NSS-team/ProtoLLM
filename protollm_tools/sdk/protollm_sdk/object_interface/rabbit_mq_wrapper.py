@@ -86,13 +86,3 @@ class RabbitMQWrapper:
         except Exception as ex:
             logger.error(f"Failed to consume messages from queue '{queue_name}'. Error: {ex}")
             raise Exception(f"Failed to consume messages from queue '{queue_name}'. Error: {ex}")
-
-    def stop_consuming(self):
-        """
-        Stop consuming messages from the queue.
-        """
-        if hasattr(self, 'channel') and self.channel.is_open:
-            logger.info("Stopping consuming messages.")
-            self.channel.stop_consuming()
-        else:
-            logger.warning("No active consuming process to stop.")

@@ -29,6 +29,7 @@ def cleanup_queues(rabbit_wrapper):
     with rabbit_wrapper.get_channel() as channel:
         channel.queue_purge("test_queue")
 
+@pytest.mark.local
 def test_publish_message(rabbit_wrapper):
     """
     Tests successful message publishing to a queue.
@@ -43,6 +44,7 @@ def test_publish_message(rabbit_wrapper):
         assert method_frame is not None, "Message not found in the queue"
         assert json.loads(body) == message, "Message in the queue does not match the sent message"
 
+@pytest.mark.local
 def test_consume_message(rabbit_wrapper):
     """
     Tests successful message consumption from a queue and stopping consuming.
@@ -56,7 +58,6 @@ def test_consume_message(rabbit_wrapper):
 
     def callback(ch, method, properties, body):
         consumed_messages.append(json.loads(body))
-        rabbit_wrapper.stop_consuming()
 
     consuming_thread = threading.Thread(
         target=rabbit_wrapper.consume_messages, args=(queue_name, callback)
@@ -69,6 +70,7 @@ def test_consume_message(rabbit_wrapper):
     assert len(consumed_messages) == 1, "Message was not consumed"
     assert consumed_messages[0] == message, "Consumed message does not match the sent message"
 
+@pytest.mark.local
 def test_publish_message_exception(rabbit_wrapper):
     """
     Tests exception handling during message publishing.
@@ -85,6 +87,7 @@ def test_publish_message_exception(rabbit_wrapper):
     with pytest.raises(Exception, match="Failed to publish message"):
         invalid_wrapper.publish_message(queue_name, message)
 
+@pytest.mark.local
 def test_consume_message_exception(rabbit_wrapper):
     """
     Tests exception handling during message consumption.
